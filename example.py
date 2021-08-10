@@ -15,15 +15,15 @@ def download_page(url, name):
 
 def compare(old_page, current_page):
     with open(old_page, 'r') as f:
-        old_list = set(f.readlines())
+        old_list = set(f.readlines()) #set(f.read().replace("\n", ""))
 
         tmp = ""
         for s in old_list:
             tmp += s
         old_list = {tmp}
 
-        soup = BeautifulSoup(old_list, 'lxml')
-        print(soup.find("table", id="tbody"))
+        soup = BeautifulSoup(tmp, 'lxml')
+        print(soup.find("table"))
 
     with (open(current_page, 'r')) as f:
         current_list = set(f.readlines())
@@ -33,8 +33,8 @@ def compare(old_page, current_page):
             tmp += s
         current_list = {tmp}
 
-        soup = BeautifulSoup(current_list, 'lxml')
-        print(soup.find("table", id="tbody"))
+        soup = BeautifulSoup(tmp, 'lxml')
+        print(soup.find("table"))
 
     open('difference.html', 'w').close()
 
@@ -68,7 +68,7 @@ if __name__ == '__main__':
 
 
         print("Сравниваем изменения...")
-        compare("old.html", "current.html")
+        compare("current.html", "old.html")
         print("Сравнение изменений произведено...")
 
         print("Перезапись...")
