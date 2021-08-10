@@ -15,32 +15,29 @@ def download_page(url, name):
 
 def compare(old_page, current_page):
     with open(old_page, 'r') as f:
-        old_list = set(f.readlines()) #set(f.read().replace("\n", ""))
+        #old_list = set(f.readlines()) 
+        delimiter = ''
+        sentenceOld = str(delimiter.join(f))
 
-        tmp = ""
-        for s in old_list:
-            tmp += s
-        old_list = {tmp}
-
-        soup = BeautifulSoup(tmp, 'lxml')
-        print(soup.find("table"))
+        #soup = BeautifulSoup(sentenceOld, 'lxml')
+        #print(soup.find("table"))
 
     with (open(current_page, 'r')) as f:
-        current_list = set(f.readlines())
+        #current_list = set(f.readlines())
+        delimiter = ''
+        sentenceCurrent = str(delimiter.join(f))
 
-        tmp = ""
-        for s in current_list:
-            tmp += s
-        current_list = {tmp}
-
-        soup = BeautifulSoup(tmp, 'lxml')
-        print(soup.find("table"))
+        #soup = BeautifulSoup(sentenceCurrent, 'lxml')
+        #print(soup.find("table"))
 
     open('difference.html', 'w').close()
 
     with open('difference.html', 'a') as f:
-        for line in list(current_list - old_list):
-            f.write(line)
+        diff = str(sentenceCurrent) - str(sentenceOld)
+        #for line in list(sentenceCurrent -= sentenceOld):
+        f.write(diff)
+
+            #line = sentenceOld.difference(sentenceCurrent)
 
 
 def copy_current_to_old(old_page, current_page):
@@ -71,10 +68,14 @@ if __name__ == '__main__':
         compare("current.html", "old.html")
         print("Сравнение изменений произведено...")
 
+        print("Запись изменений...")
+        check_exist_file("difference.html")
+        print("Запись изменений получена...")
+
         print("Перезапись...")
         copy_current_to_old("old.html", "current.html")
         print("Готово")
 
         # Приостанавливаем выполнение программы на 10с
-        print("Ожидаем 10с...")
-        time.sleep(10)
+        #print("Ожидаем 10с...")
+        #time.sleep(10)
