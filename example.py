@@ -101,7 +101,7 @@ def query():
         conn.close()
 
 def insert_tournament(tournament):
-    query = "INSERT INTO tournament_go (tournament_go_id, t_month, t_dates, t_name, city) VALUES(tournament)"
+    query = "INSERT INTO tournament_go (t_month, t_dates, t_name, city) VALUES(%s, %s, %s, %s)"
 
     try:
         dbconfig = read_db_config()
@@ -117,7 +117,7 @@ def insert_tournament(tournament):
         conn.close()
 
 def main():
-    tournament = ("Сентябрь", "2021-09-03", "турнир тест", "Москва")
+    tournament = [("Сентябрь", "2021-09-03", "турнир тест2", "Москва")]
     insert_tournament(tournament)
 
 
