@@ -1,14 +1,10 @@
 import requests
-import time
 import os
 from bs4 import BeautifulSoup
-from itertools import islice	
-import mysql.connector
-from mysql.connector import MySQLConnection, Error
+from mysql.connector import MySQLConnection
 from mysql_dbconfig import read_db_config
 from mysql.connector import Error
 from datetime import date
-from datetime import time
 from datetime import datetime   #Библиотеки
 
 def data():          #функция для вывода сегодняшней даты            
@@ -21,8 +17,7 @@ def data():          #функция для вывода сегодняшней 
 def download_page(url, name):  #функция для скачивания актуальной версии турниров по ссылке
     r = requests.get(url)
     with open(name, 'w') as output_file:
-        output_file.write(r.text)
-
+        output_file.write(r.text) 
     r.close()
 
 
@@ -125,19 +120,17 @@ def main():
 
 if __name__ == '__main__':
 
-        print("Подключение к бд...")
-        connect()
-        print("Ок..")
+        #print("Подключение к бд...")
+        #connect()
+        #print("Ок..")
         
-        print("Получение результата запроса...")
-        main()
-        print("Ок..")
+        #print("Получение результата запроса...")
+        #main()
+        #print("Ок..")
 
-
-        
-        #print("Получаем актуальную информацию о турнирах...")
-        #download_page("https://gofederation.ru/tournaments/", "current.html")
-        #print("Актуальная информация о турнирах получена...")
+        print("Получаем актуальную информацию о турнирах...")
+        download_page("https://gofederation.ru/tournaments/", "current.html")
+        print("Актуальная информация о турнирах получена...")
 
         #print("Сравниваем изменения...")
         #compare("current.html", "old.html")
