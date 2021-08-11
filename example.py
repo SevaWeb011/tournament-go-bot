@@ -3,6 +3,10 @@ import time
 import os
 from bs4 import BeautifulSoup
 from itertools import islice	
+import mysql.connector
+from mysql.connector import MySQLConnection, Error
+from mysql_dbconfig import read_db_config
+from mysql.connector import Error
 from datetime import date
 from datetime import time
 from datetime import datetime   #Библиотеки
@@ -56,28 +60,96 @@ def check_exist_file(name):
     if not os.path.isfile(name):
         with open(name, 'w'): pass
 
+def connect():
+    db_config = read_db_config()
+
+    try:
+        print('Connecting to MySQL database...')
+        conn = MySQLConnection(**db_config)
+
+        if conn.is_connected():
+            print('connection established.')
+        else:
+            print('connection failed.')
+
+    except Error as error:
+        print(error)
+
+    finally:
+        conn.close()
+        print('Connection closed.')
+
+
+def query():
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM tournament_go")
+        print(cursor.execute)
+        row = cursor.fetchone()
+
+        while row is not None:
+            print(row)
+            row = cursor.fetchone()
+
+    except Error as e:
+        print(e)
+
+    finally:
+        cursor.close()
+        conn.close()
+
+def insert_tournament(tournament):
+    query = "INSERT INTO tournament_go (tournament_go_id, t_month, t_dates, t_name, city) VALUES(tournament)"
+
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.executemany(query, tournament)
+        conn.commit()
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+
+def main():
+    tournament = ("Сентябрь", "2021-09-03", "турнир тест", "Москва")
+    insert_tournament(tournament)
+
+
+
 
 if __name__ == '__main__':
 
+        print("Подключение к бд...")
+        connect()
+        print("Ок..")
+        
+        print("Получение результата запроса...")
+        main()
+        print("Ок..")
 
-        check_exist_file("current.html")
-        check_exist_file("old.html")
 
-        print("Получаем актуальную информацию о турнирах...")
-        download_page("https://gofederation.ru/tournaments/", "current.html")
-        print("Актуальная информация о турнирах получена...")
+        
+        #print("Получаем актуальную информацию о турнирах...")
+        #download_page("https://gofederation.ru/tournaments/", "current.html")
+        #print("Актуальная информация о турнирах получена...")
 
-        print("Сравниваем изменения...")
-        compare("current.html", "old.html")
-        print("Сравнение изменений произведено...")
+        #print("Сравниваем изменения...")
+        #compare("current.html", "old.html")
+        #print("Сравнение изменений произведено...")
 
-        print("Запись изменений...")
-        check_exist_file("difference.html")
-        print("Запись изменений получена...")
+        #print("Запись изменений...")
+        #check_exist_file("difference.html")
+        #print("Запись изменений получена...")
 
-        print("Перезапись...")
-        copy_current_to_old("old.html", "current.html")
-        print("Готово")
+        #print("Перезапись...")
+        #copy_current_to_old("old.html", "current.html")
+        #print("Готово")
 
         #print("Сегодня") 
         #data()
