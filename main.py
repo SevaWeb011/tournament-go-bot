@@ -115,11 +115,39 @@ def main():
     tournament = [("Сентябрь", "2021-09-03", "турнир тест2", "Москва")]
     insert_tournament(tournament)
 
-
+def getText(): 
+    html = """<tr class="m">
+    <td class="m" rowspan="2"><span>декабрь</span></td>
+    <td style="padding-right:0;">25.12.2021</td>
+    <td style="padding-left:0;">26.12.2021</td>
+    <td><a class="tournament-2" href="/tournaments/595050511">Чемпионат Республики Татарстан </a></td>
+    <td>Казань</td>
+</tr>
+<tr class="m">
+    <td class="m" rowspan="2"><span>декабрь</span></td>
+    <td style="padding-right:0;">25.12.2021</td>
+    <td style="padding-left:0;">26.12.2021</td>
+    <td><a class="tournament-2" href="/tournaments/595050511">Чемпионат Республики Татарстан </a></td>
+    <td>Кdgtjf</td>
+</tr>
+<tr class="m">
+    <td class="m" rowspan="2"><span>декабрь</span></td>
+    <td style="padding-right:0;">25.12.2021</td>
+    <td style="padding-left:0;">26.12.2021</td>
+    <td><a class="tournament-2" href="/tournaments/595050511">Чемпионат Республики Татарстан </a></td>
+    <td>Каfjyань</td>
+</tr>"""
+    root = BeautifulSoup(html, 'html.parser')
+    tr = root.select('tr')
+    for t in tr:
+      tmp = t.text.removeprefix("\n").removesuffix("\n").split("\n")
+      print(tmp)
 
 
 if __name__ == '__main__':
 
+        getText()
+        
         #print("Подключение к бд...")
         #connect()
         #print("Ок..")
@@ -128,9 +156,9 @@ if __name__ == '__main__':
         #main()
         #print("Ок..")
 
-        print("Получаем актуальную информацию о турнирах...")
-        download_page("https://gofederation.ru/tournaments/", "current.html")
-        print("Актуальная информация о турнирах получена...")
+        #print("Получаем актуальную информацию о турнирах...")
+        #download_page("https://gofederation.ru/tournaments/", "current.html")
+        #print("Актуальная информация о турнирах получена...")
 
         #print("Сравниваем изменения...")
         #compare("current.html", "old.html")
