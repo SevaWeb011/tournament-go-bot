@@ -116,37 +116,33 @@ def main():
     insert_tournament(tournament)
 
 def getText(): 
-    html = """<tr class="m">
-    <td class="m" rowspan="2"><span>декабрь</span></td>
-    <td style="padding-right:0;">25.12.2021</td>
-    <td style="padding-left:0;">26.12.2021</td>
-    <td><a class="tournament-2" href="/tournaments/595050511">Чемпионат Республики Татарстан </a></td>
-    <td>Казань</td>
-</tr>
-<tr class="m">
-    <td class="m" rowspan="2"><span>декабрь</span></td>
-    <td style="padding-right:0;">25.12.2021</td>
-    <td style="padding-left:0;">26.12.2021</td>
-    <td><a class="tournament-2" href="/tournaments/595050511">Чемпионат Республики Татарстан </a></td>
-    <td>Кdgtjf</td>
-</tr>
-<tr class="m">
-    <td class="m" rowspan="2"><span>декабрь</span></td>
-    <td style="padding-right:0;">25.12.2021</td>
-    <td style="padding-left:0;">26.12.2021</td>
-    <td><a class="tournament-2" href="/tournaments/595050511">Чемпионат Республики Татарстан </a></td>
-    <td>Каfjyань</td>
-</tr>"""
+    html = open('current.html')
+    print(str(html))
+    open('tournament.html', 'w').close()
     root = BeautifulSoup(html, 'html.parser')
+    #tbody = root.select('tbody')
     tr = root.select('tr')
-    for t in tr:
-      tmp = t.text.removeprefix("\n").removesuffix("\n").split("\n")
-      print(tmp)
+    with open('tournament.html', 'w') as f: 
 
+        for t in tr:
+            tmp = t.text.removeprefix("\n").removesuffix("\n").split("\n")
+            if len(tmp) == 5:
+                f.writelines("Месяц: " + tmp[0] + "\n")
+                f.writelines("Начало: " + tmp[1] + "\n")
+                f.writelines("Конец: " + tmp[2] + "\n")
+                f.writelines("Название:" + tmp[3] + "\n")
+                f.writelines("Город:" + tmp[4] + "\n")
+                f.writelines("\n\n")
+            else:
+                f.writelines("Начало: " + tmp[0] + "\n")
+                f.writelines("Конец: " + tmp[1] + "\n")
+                f.writelines("Название:" + tmp[2] + "\n")
+                f.writelines("Город:" + tmp[3] + "\n")
+                f.writelines("\n\n")
 
 if __name__ == '__main__':
 
-        getText()
+        #getText()
         
         #print("Подключение к бд...")
         #connect()
@@ -159,6 +155,8 @@ if __name__ == '__main__':
         #print("Получаем актуальную информацию о турнирах...")
         #download_page("https://gofederation.ru/tournaments/", "current.html")
         #print("Актуальная информация о турнирах получена...")
+
+        getText()
 
         #print("Сравниваем изменения...")
         #compare("current.html", "old.html")
