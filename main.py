@@ -125,8 +125,7 @@ def getText():
             tournaments.append(tour)
 
     return tournaments
-        
-
+    
 if __name__ == '__main__':
 
         
