@@ -6,10 +6,9 @@ from mysql_dbconfig import read_db_config
 from mysql.connector import Error
 from datetime import date
 import tournament
-import datetime as DT
 from datetime import datetime   #Библиотеки
 
-def data():          #функция для вывода сегодняшней даты            
+def data(): #функция для вывода сегодняшней даты            
     today=datetime.now()
     wd=date.weekday(today)
     days= ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]
@@ -57,45 +56,6 @@ def check_exist_file(name):
     if not os.path.isfile(name):
         with open(name, 'w'): pass
 
-def connect():
-    db_config = read_db_config()
-
-    try:
-        print('Connecting to MySQL database...')
-        conn = MySQLConnection(**db_config)
-
-        if conn.is_connected():
-            print('connection established.')
-        else:
-            print('connection failed.')
-
-    except Error as error:
-        print(error)
-
-    finally:
-        conn.close()
-        print('Connection closed.')
-
-
-def query():
-    try:
-        dbconfig = read_db_config()
-        conn = MySQLConnection(**dbconfig)
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM tournament_go")
-        print(cursor.execute)
-        row = cursor.fetchone()
-
-        while row is not None:
-            print(row)
-            row = cursor.fetchone()
-
-    except Error as e:
-        print(e)
-
-    finally:
-        cursor.close()
-        conn.close()
 
 def insert_tournament(tournaments):
     for tour in tournaments:
@@ -170,10 +130,6 @@ def getText():
 if __name__ == '__main__':
 
         
-        #print("Подключение к бд...")
-        #connect()
-        #print("Ок..")
-        
         print("Получение результата запроса...")
         main()
         print("Ок..")
@@ -181,8 +137,6 @@ if __name__ == '__main__':
         #print("Получаем актуальную информацию о турнирах...")
         #download_page("https://gofederation.ru/tournaments/", "current.html")
         #print("Актуальная информация о турнирах получена...")
-
-        #getText()
 
         #print("Сравниваем изменения...")
         #compare("current.html", "old.html")
