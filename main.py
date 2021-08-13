@@ -5,6 +5,7 @@ from mysql.connector import MySQLConnection
 from mysql_dbconfig import read_db_config
 from mysql.connector import Error
 from datetime import date
+import datetime as DT
 from datetime import datetime   #Библиотеки
 
 def data():          #функция для вывода сегодняшней даты            
@@ -96,26 +97,6 @@ def query():
         conn.close()
 
 def insert_tournament(tournament):
-    query = "INSERT INTO tournament_go (t_month, t_dates, t_name, city) VALUES(%s, %s, %s, %s)"
-
-    try:
-        dbconfig = read_db_config()
-        conn = MySQLConnection(**dbconfig)
-        cursor = conn.cursor()
-        cursor.executemany(query, tournament)
-        conn.commit()
-    except Error as e:
-        print('Error:', e)
-
-    finally:
-        cursor.close()
-        conn.close()
-
-def main():
-    tournament = [("Сентябрь", "2021-09-03", "турнир тест2", "Москва")]
-    insert_tournament(tournament)
-
-def getText(): 
     html = open('current.html')
     open('tournament.html', 'w').close()
     root = BeautifulSoup(html, 'lxml')
@@ -131,33 +112,75 @@ def getText():
                     continue
 
                 if "padding-right" in str(i):
-                    f.writelines("Начало: " + i.text.replace(" - ", "") + "\n")
+                    f.writelines(i.text.replace(" - ", "") + "\n")
                     continue
 
                 if "padding-left" in str(i):
-                    f.writelines("Конец: " + i.text + "\n")
+                    f.writelines(i.text + "\n")
                     continue
 
                 if "tournament" in str(i):
-                    f.writelines("Название: " + i.text + "\n")
+                    f.writelines(i.text + "\n")
                     continue
 
-                f.writelines("Город: " + i.text + "\n\n")
+                f.writelines(i.text + "\n\n")
+    query = "INSERT INTO tournament_go (t_start, t_end, t_name, city) VALUES(%s, %s, %s, %s)"
+
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.executemany(query, tournament)
+        conn.commit()
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+
+def main():
+    tournament = [({t_start}, {t_end}, {t_name}, {city})]
+    insert_tournament(tournament)
+
+def getText(): 
+    html = open('current.html')
+    #open('tournament.html', 'w').close()
+    root = BeautifulSoup(html, 'lxml')
+    tr = root.select('tr')
+    with open('tournament.html', 'w') as f: 
+
+        for t in tr:
+            td = t.select('td')
+            for i in td:
+                print(i.text)
+                if 'class="m"' in str(i):
+                    f.writelines(i.text.replace(i.text, ""))
+                    continue
+
+                if "padding-right" in str(i):
+                    f.writelines(i.text.replace(" - ", "") + "\n")
+                    text_date = i.text.replace("\xa0-\xa0", "")
+                    format_string = "%d.%m.%Y"
+                    t_start = datetime.strptime(text_date, format_string).strftime("%Y-%m-%d")
+                    continue
+
+                if "padding-left" in str(i):
+                    f.writelines(i.text + "\n")
+                    text_date = i.text
+                    format_string = "%d.%m.%Y"
+                    t_end = datetime.strptime(text_date, format_string).strftime("%Y-%m-%d")
+                    continue
+
+                if "tournament" in str(i):
+                    f.writelines(i.text + "\n")
+                    t_name = i.text
+                    continue
+
+                f.writelines(i.text + "\n\n")
+                city = i.text
             
-            #tmp = t.text.removeprefix("\n").removesuffix("\n").split("\n")
-            #if len(tmp) == 5:
-            #    f.writelines("Месяц: " + tmp[0] + "\n")
-            #    f.writelines("Начало: " + tmp[1] + "\n")
-            #    f.writelines("Конец: " + tmp[2] + "\n")
-            #    f.writelines("Название:" + tmp[3] + "\n")
-            #    f.writelines("Город:" + tmp[4] + "\n")
-            #    f.writelines("\n\n")
-            #if len(tmp) == 4:
-            #    f.writelines("Начало: " + tmp[0] + "\n")
-            #    f.writelines("Конец: " + tmp[1] + "\n")
-            #    f.writelines("Название:" + tmp[2] + "\n")
-            #    f.writelines("Город:" + tmp[3] + "\n")
-            #    f.writelines("\n\n")
+        
 
 if __name__ == '__main__':
 
