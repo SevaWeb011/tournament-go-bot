@@ -117,28 +117,48 @@ def main():
 
 def getText(): 
     html = open('current.html')
-    print(str(html))
+    #print(str(html))
     open('tournament.html', 'w').close()
-    root = BeautifulSoup(html, 'html.parser')
+    root = BeautifulSoup(html, 'lxml')
     #tbody = root.select('tbody')
     tr = root.select('tr')
     with open('tournament.html', 'w') as f: 
 
         for t in tr:
-            tmp = t.text.removeprefix("\n").removesuffix("\n").split("\n")
-            if len(tmp) == 5:
-                f.writelines("Месяц: " + tmp[0] + "\n")
-                f.writelines("Начало: " + tmp[1] + "\n")
-                f.writelines("Конец: " + tmp[2] + "\n")
-                f.writelines("Название:" + tmp[3] + "\n")
-                f.writelines("Город:" + tmp[4] + "\n")
-                f.writelines("\n\n")
-            else:
-                f.writelines("Начало: " + tmp[0] + "\n")
-                f.writelines("Конец: " + tmp[1] + "\n")
-                f.writelines("Название:" + tmp[2] + "\n")
-                f.writelines("Город:" + tmp[3] + "\n")
-                f.writelines("\n\n")
+            td = t.select('td')
+            for i in td:
+                print(i.text)
+                if 'class="m"' in str(i):
+                    f.writelines("Месяц: " + i.text + "\n")
+                    continue
+
+                if "padding-right" in str(i):
+                    f.writelines("Начало: " + i.text.replace(" - ", "") + "\n")
+                    continue
+
+                if "padding-left" in str(i):
+                    f.writelines("Конец: " + i.text + "\n")
+                    continue
+
+                if "tournament" in str(i):
+                    f.writelines("Название: " + i.text + "\n")
+                    continue
+
+                f.writelines("Город: " + i.text + "\n")
+            #tmp = t.text.removeprefix("\n").removesuffix("\n").split("\n")
+            #if len(tmp) == 5:
+            #    f.writelines("Месяц: " + tmp[0] + "\n")
+            #    f.writelines("Начало: " + tmp[1] + "\n")
+            #    f.writelines("Конец: " + tmp[2] + "\n")
+            #    f.writelines("Название:" + tmp[3] + "\n")
+            #    f.writelines("Город:" + tmp[4] + "\n")
+            #    f.writelines("\n\n")
+            #if len(tmp) == 4:
+            #    f.writelines("Начало: " + tmp[0] + "\n")
+            #    f.writelines("Конец: " + tmp[1] + "\n")
+            #    f.writelines("Название:" + tmp[2] + "\n")
+            #    f.writelines("Город:" + tmp[3] + "\n")
+            #    f.writelines("\n\n")
 
 if __name__ == '__main__':
 
