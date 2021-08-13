@@ -117,10 +117,8 @@ def main():
 
 def getText(): 
     html = open('current.html')
-    #print(str(html))
     open('tournament.html', 'w').close()
     root = BeautifulSoup(html, 'lxml')
-    #tbody = root.select('tbody')
     tr = root.select('tr')
     with open('tournament.html', 'w') as f: 
 
@@ -129,7 +127,7 @@ def getText():
             for i in td:
                 print(i.text)
                 if 'class="m"' in str(i):
-                    f.writelines("Месяц: " + i.text + "\n")
+                    f.writelines(i.text.replace(i.text, ""))
                     continue
 
                 if "padding-right" in str(i):
@@ -144,7 +142,8 @@ def getText():
                     f.writelines("Название: " + i.text + "\n")
                     continue
 
-                f.writelines("Город: " + i.text + "\n")
+                f.writelines("Город: " + i.text + "\n\n")
+            
             #tmp = t.text.removeprefix("\n").removesuffix("\n").split("\n")
             #if len(tmp) == 5:
             #    f.writelines("Месяц: " + tmp[0] + "\n")
