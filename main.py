@@ -125,29 +125,29 @@ def getText():
             tournaments.append(tour)
 
     return tournaments
-    
+
 if __name__ == '__main__':
 
         
-        print("Получение результата запроса...")
-        main()
-        print("Ок..")
+        #print("Получение результата запроса...")
+        #main()
+        #print("Ок..")
 
-        #print("Получаем актуальную информацию о турнирах...")
-        #download_page("https://gofederation.ru/tournaments/", "current.html")
-        #print("Актуальная информация о турнирах получена...")
+        print("Получаем актуальную информацию о турнирах...")
+        download_page("https://gofederation.ru/tournaments/", "current.html")
+        print("Актуальная информация о турнирах получена...")
 
-        #print("Сравниваем изменения...")
-        #compare("current.html", "old.html")
-        #print("Сравнение изменений произведено...")
+        print("Сравниваем изменения...")
+        compare("current.html", "old.html")
+        print("Сравнение изменений произведено...")
 
-        #print("Запись изменений...")
-        #check_exist_file("difference.html")
-        #print("Запись изменений получена...")
+        print("Запись изменений...")
+        check_exist_file("difference.html")
+        print("Запись изменений получена...")
 
-        #print("Перезапись...")
-        #copy_current_to_old("old.html", "current.html")
-        #print("Готово")
+        print("Перезапись...")
+        copy_current_to_old("old.html", "current.html")
+        print("Готово")
 
         #print("Сегодня") 
         #data()
