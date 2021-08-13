@@ -5,6 +5,7 @@ from mysql.connector import MySQLConnection
 from mysql_dbconfig import read_db_config
 from mysql.connector import Error
 from datetime import date
+import tournament
 import datetime as DT
 from datetime import datetime   #Библиотеки
 
@@ -96,109 +97,92 @@ def query():
         cursor.close()
         conn.close()
 
-def insert_tournament(tournament):
-    html = open('current.html')
-    open('tournament.html', 'w').close()
-    root = BeautifulSoup(html, 'lxml')
-    tr = root.select('tr')
-    with open('tournament.html', 'w') as f: 
+def insert_tournament(tournaments):
+    for tour in tournaments:
+        query = "INSERT INTO tournament_go (t_start, t_end, t_name, city) VALUES(%s, %s, %s, %s)"
 
-        for t in tr:
-            td = t.select('td')
-            for i in td:
-                print(i.text)
-                if 'class="m"' in str(i):
-                    f.writelines(i.text.replace(i.text, ""))
-                    continue
+        try:
+            dbconfig = read_db_config()
+            conn = MySQLConnection(**dbconfig)
+            cursor = conn.cursor()
+            cursor.execute(query, [tour.start, tour.end, tour.name, tour.city])
+            conn.commit()
+        except Error as e:
+            print('Error:', e)
 
-                if "padding-right" in str(i):
-                    f.writelines(i.text.replace(" - ", "") + "\n")
-                    continue
-
-                if "padding-left" in str(i):
-                    f.writelines(i.text + "\n")
-                    continue
-
-                if "tournament" in str(i):
-                    f.writelines(i.text + "\n")
-                    continue
-
-                f.writelines(i.text + "\n\n")
-    query = "INSERT INTO tournament_go (t_start, t_end, t_name, city) VALUES(%s, %s, %s, %s)"
-
-    try:
-        dbconfig = read_db_config()
-        conn = MySQLConnection(**dbconfig)
-        cursor = conn.cursor()
-        cursor.executemany(query, tournament)
-        conn.commit()
-    except Error as e:
-        print('Error:', e)
-
-    finally:
-        cursor.close()
-        conn.close()
+        finally:
+            cursor.close()
+            conn.close()
 
 def main():
-    tournament = [({t_start}, {t_end}, {t_name}, {city})]
-    insert_tournament(tournament)
+    tournaments = getText()
+    insert_tournament(tournaments)
 
 def getText(): 
     html = open('current.html')
     #open('tournament.html', 'w').close()
     root = BeautifulSoup(html, 'lxml')
     tr = root.select('tr')
-    with open('tournament.html', 'w') as f: 
+    tournaments = []
+    #with open('tournament.html', 'w') as f: 
 
-        for t in tr:
-            td = t.select('td')
-            for i in td:
-                print(i.text)
-                if 'class="m"' in str(i):
-                    f.writelines(i.text.replace(i.text, ""))
-                    continue
+    for t in tr:
+        td = t.select('td')
+        tour = tournament.Tournament()
 
-                if "padding-right" in str(i):
-                    f.writelines(i.text.replace(" - ", "") + "\n")
-                    text_date = i.text.replace("\xa0-\xa0", "")
-                    format_string = "%d.%m.%Y"
-                    t_start = datetime.strptime(text_date, format_string).strftime("%Y-%m-%d")
-                    continue
+        for i in td:
+            if 'class="m"' in str(i):
+                #f.writelines(i.text.replace(i.text, ""))
+                continue
 
-                if "padding-left" in str(i):
-                    f.writelines(i.text + "\n")
-                    text_date = i.text
-                    format_string = "%d.%m.%Y"
-                    t_end = datetime.strptime(text_date, format_string).strftime("%Y-%m-%d")
-                    continue
+            if "padding-right" in str(i):
+                #f.writelines(i.text.replace(" - ", "") + "\n")
+                text_date = i.text.replace("\xa0-\xa0", "")
+                format_string = "%d.%m.%Y"
+                t_start = datetime.strptime(text_date, format_string).strftime("%Y-%m-%d")
+                tour.setStart(t_start)
+                continue
 
-                if "tournament" in str(i):
-                    f.writelines(i.text + "\n")
-                    t_name = i.text
-                    continue
+            if "padding-left" in str(i):
+                #f.writelines(i.text + "\n")
+                text_date = i.text
+                format_string = "%d.%m.%Y"
+                t_end = datetime.strptime(text_date, format_string).strftime("%Y-%m-%d")
+                tour.setEnd(t_end)
+                continue
 
-                f.writelines(i.text + "\n\n")
-                city = i.text
-            
+            if "tournament" in str(i):
+                #f.writelines(i.text + "\n")
+                t_name = i.text
+                tour.setName(t_name)
+                continue
+
+            #f.writelines(i.text + "\n\n")
+            city = i.text
+            tour.setCity(city)
+
+        if tour.name != "":
+            tournaments.append(tour)
+
+    return tournaments
         
 
 if __name__ == '__main__':
 
-        #getText()
         
         #print("Подключение к бд...")
         #connect()
         #print("Ок..")
         
-        #print("Получение результата запроса...")
-        #main()
-        #print("Ок..")
+        print("Получение результата запроса...")
+        main()
+        print("Ок..")
 
         #print("Получаем актуальную информацию о турнирах...")
         #download_page("https://gofederation.ru/tournaments/", "current.html")
         #print("Актуальная информация о турнирах получена...")
 
-        getText()
+        #getText()
 
         #print("Сравниваем изменения...")
         #compare("current.html", "old.html")
