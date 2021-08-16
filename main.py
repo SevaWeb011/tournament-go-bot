@@ -9,7 +9,7 @@ import tournament
 from datetime import datetime   #Библиотеки
 
 def date(): #функция для вывода сегодняшней даты            
-    today = str(datetime.now().date())
+    today = datetime.now().date()
     #today = datetime.today().strftime('%Y-%m-%d')
     #print(today)
     return today
@@ -17,7 +17,7 @@ def date(): #функция для вывода сегодняшней даты
 def download_page(url, name):  #функция для скачивания актуальной версии турниров по ссылке
     r = requests.get(url)
     with open(name, 'w') as output_file:
-        output_file.write(r.text) 
+        output_file.write(r.text.replace("&nbsp;-&nbsp;", "")) 
     r.close()
 
 
@@ -78,7 +78,7 @@ def main():
     insert_tournament(tournaments)
 
 def getText(): 
-    html = open('current.html')
+    html = open('difference.html')
     #open('tournament.html', 'w').close()
     root = BeautifulSoup(html, 'lxml')
     tr = root.select('tr')
@@ -91,11 +91,9 @@ def getText():
 
         for i in td:
             if 'class="m"' in str(i):
-                #f.writelines(i.text.replace(i.text, ""))
                 continue
 
             if "padding-right" in str(i):
-                #f.writelines(i.text.replace(" - ", "") + "\n")
                 text_date = i.text.replace("\xa0-\xa0", "")
                 format_string = "%d.%m.%Y"
                 t_start = datetime.strptime(text_date, format_string).strftime("%Y-%m-%d")
@@ -103,7 +101,6 @@ def getText():
                 continue
 
             if "padding-left" in str(i):
-                #f.writelines(i.text + "\n")
                 text_date = i.text
                 format_string = "%d.%m.%Y"
                 t_end = datetime.strptime(text_date, format_string).strftime("%Y-%m-%d")
@@ -111,12 +108,10 @@ def getText():
                 continue
 
             if "tournament" in str(i):
-                #f.writelines(i.text + "\n")
                 t_name = i.text
                 tour.setName(t_name)
                 continue
 
-            #f.writelines(i.text + "\n\n")
             city = i.text
             tour.setCity(city)
 
@@ -130,13 +125,18 @@ def delete_old_tournaments():
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM tournament_go WHERE t_start < '2021-08-13';")
-        print(cursor.execute)
-        row = cursor.fetchone()
+        date_var = str(date())
+        sql = "DELETE FROM tournament_go WHERE DATE(t_start) < DATE(%s);"
+        params = [date_var]
+        tmp = cursor.execute(sql, params)
+        #print("")
+        #cursor.execute("DELETE FROM tournament_go WHERE t_start < '2021-08-13';")
+        #print(cursor.execute)
+        #row = cursor.fetchone()
 
-        while row is not None:
-            print(row)
-            row = cursor.fetchone()
+        #while row is not None:
+        #    print(row)
+        #    row = cursor.fetchone()
 
     except Error as e:
         print(e)
@@ -148,11 +148,7 @@ def delete_old_tournaments():
 
 if __name__ == '__main__':
 
-        
-        #print("Получение результата запроса...")
-        #main()
-        #print("Ок..")
-
+    
         #print("Получаем актуальную информацию о турнирах...")
         #download_page("https://gofederation.ru/tournaments/", "current.html")
         #print("Актуальная информация о турнирах получена...")
@@ -173,5 +169,4 @@ if __name__ == '__main__':
         #main()
         #print("Ок..")
 
-        #date()
-        delete_old_tournaments()
+        #delete_old_tournaments()
