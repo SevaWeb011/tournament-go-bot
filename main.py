@@ -128,8 +128,8 @@ def delete_old_tournaments():
         date_var = str(date())
         sql = "DELETE FROM tournament_go WHERE DATE(t_start) < DATE(%s);"
         params = [date_var]
-        tmp = cursor.execute(sql, params)
-        #print("")
+        cursor.execute(sql, params)
+        conn.commit()
         #cursor.execute("DELETE FROM tournament_go WHERE t_start < '2021-08-13';")
         #print(cursor.execute)
         #row = cursor.fetchone()
@@ -144,6 +144,32 @@ def delete_old_tournaments():
     finally:
         cursor.close()
         conn.close()
+
+def all_tournaments():
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("SELECT t_start, t_end, t_name, city FROM tournament_go;")
+        tournament = ""
+        result = cursor.fetchall()
+        for item in result:
+            tournament += "Начало: " + str(item[0]) + "\n"
+            tournament += "Конец: " + str(item[1]) + "\n"
+            tournament += "Название: " + item[2] + "\n"
+            tournament += "Город: " + item[3] + "\n"
+            tournament += "===================" + "\n"
+
+            
+        conn.commit()
+
+    except Error as e:
+        print(e)
+
+    finally:
+        cursor.close()
+        conn.close()
+        return tournament
 
 
 if __name__ == '__main__':
@@ -169,4 +195,4 @@ if __name__ == '__main__':
         #main()
         #print("Ок..")
 
-        #delete_old_tournaments()
+        delete_old_tournaments()
