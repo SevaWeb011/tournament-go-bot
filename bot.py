@@ -1,7 +1,14 @@
-import main
-from telebot import apihelper
 import telebot
-bot = telebot.TeleBot('1977406104:AAEWaArJA8UlIzgrfiY7U-DS0yPmMaQs7fQ')
+import main
+from bot_config import read_bot_config
+
+bot_config = read_bot_config()
+token = bot_config['token']
+bot = telebot.TeleBot(token)
+
+def on_start(update, context):
+	chat = update.effective_chat
+	context.bot.send_message(chat_id=chat.id, text="Привет, я бот")
 
 @bot.message_handler(commands=['start'])
 def start_message(message):

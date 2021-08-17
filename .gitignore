@@ -2,3 +2,4 @@ config.ini
 current.html
 difference.html
 tournament.html
+token_bot.py
