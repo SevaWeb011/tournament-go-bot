@@ -4,7 +4,8 @@ from bs4 import BeautifulSoup
 from mysql.connector import MySQLConnection
 from mysql_dbconfig import read_db_config
 from mysql.connector import Error
-from datetime import date
+from datetime import date 
+from datetime import datetime, timedelta
 import tournament
 from datetime import datetime   #Библиотеки
 
@@ -130,13 +131,7 @@ def delete_old_tournaments():
         params = [date_var]
         cursor.execute(sql, params)
         conn.commit()
-        #cursor.execute("DELETE FROM tournament_go WHERE t_start < '2021-08-13';")
-        #print(cursor.execute)
-        #row = cursor.fetchone()
-
-        #while row is not None:
-        #    print(row)
-        #    row = cursor.fetchone()
+        
 
     except Error as e:
         print(e)
@@ -151,16 +146,44 @@ def all_tournaments():
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
         cursor.execute("SELECT t_start, t_end, t_name, city FROM tournament_go;")
-        tournament = ""
+        all_tournaments = []
         result = cursor.fetchall()
         for item in result:
-            tournament += "Начало: " + str(item[0]) + "\n"
+            tournament = "Начало: " + str(item[0]) + "\n"
             tournament += "Конец: " + str(item[1]) + "\n"
             tournament += "Название: " + item[2] + "\n"
             tournament += "Город: " + item[3] + "\n"
-            tournament += "===================" + "\n"
-
+            all_tournaments.append(tournament)
             
+        conn.commit()
+
+    except Error as e:
+        print(e)
+
+    finally:
+        cursor.close()
+        conn.close()
+        return all_tournaments
+
+def weekend_tournaments():
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("SELECT t_start, t_end, t_name, city FROM tournament_go;")
+        tournament = ""
+        result = cursor.fetchall()
+
+        for item in result:
+            if item[0] == get_saturday():
+                tournament += "Начало: " + str(item[0]) + "\n"
+                tournament += "Конец: " + str(item[1]) + "\n"
+                tournament += "Название: " + item[2] + "\n"
+                tournament += "Город: " + item[3] + "\n"
+                tournament += "==============================" + "\n\n"
+                if item[0] != get_saturday():
+                    tournament += "На ближайших выходных турниров нет :("
+
         conn.commit()
 
     except Error as e:
@@ -171,8 +194,28 @@ def all_tournaments():
         conn.close()
         return tournament
 
+def get_saturday():
+    num_date = datetime.now().date().weekday()
+    today = datetime.now().date()
+    saturday = ""
 
-if __name__ == '__main__':
+    if num_date == 0 :
+        saturday = today + timedelta(days=5)
+    if num_date == 1 :
+        saturday = today + timedelta(days=4)
+    if num_date == 3 :
+        saturday = today + timedelta(days=3)
+    if num_date == 4 :
+        saturday = today + timedelta(days=2)
+    if num_date == 5 :
+        saturday = today + timedelta(days=1)
+    if num_date == 6 :
+        saturday = today + timedelta(days=6)
+
+    return saturday
+
+
+#if __name__ == '__main__':
 
     
         #print("Получаем актуальную информацию о турнирах...")
@@ -195,4 +238,7 @@ if __name__ == '__main__':
         #main()
         #print("Ок..")
 
-        delete_old_tournaments()
+        #weekend_tournaments()
+        #delete_old_tournaments()
+
+         
