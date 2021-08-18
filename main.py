@@ -194,30 +194,73 @@ def weekend_tournaments():
         conn.close()
         return tournament
 
-def get_saturday():
+def get_saturday(): #эта функция получает дату субботы текущей недели 
     num_date = datetime.now().date().weekday()
     today = datetime.now().date()
     saturday = ""
 
-    if num_date == 0 :
+    if num_date == 0:
         saturday = today + timedelta(days=5)
-    if num_date == 1 :
+    if num_date == 1:
         saturday = today + timedelta(days=4)
-    if num_date == 3 :
-        saturday = today + timedelta(days=3)
-    if num_date == 4 :
+    if num_date == 2:
+        saturday = today + timedelta(days=3)    
+    if num_date == 3:
         saturday = today + timedelta(days=2)
-    if num_date == 5 :
+    if num_date == 4:
         saturday = today + timedelta(days=1)
-    if num_date == 6 :
+    if num_date == 5:
+        saturday = today + timedelta(days=0)
+    if num_date == 6:
         saturday = today + timedelta(days=6)
 
     return saturday
 
 
+def check_exist_user(chatID):
+
+    query = "SELECT * FROM `user_BotGo` WHERE id_User='" + str(chatID) + "';"
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute(query)
+
+        if len(cursor.fetchall()) != 0:
+            return True
+        else:
+            return False
+
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        conn.close()
+
+
+def query_users(users):
+
+    if check_exist_user(users[0]):
+        return
+
+    query = "INSERT INTO user_BotGo (id_User, first_name, last_name, username) VALUES(%s, %s, %s, %s)"
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute(query, users)
+        conn.commit()
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+
+
 #if __name__ == '__main__':
 
-    
+        #get_saturday()
         #print("Получаем актуальную информацию о турнирах...")
         #download_page("https://gofederation.ru/tournaments/", "current.html")
         #print("Актуальная информация о турнирах получена...")
@@ -240,5 +283,6 @@ def get_saturday():
 
         #weekend_tournaments()
         #delete_old_tournaments()
+        #print("Готово")
 
          
