@@ -7,6 +7,7 @@ from mysql.connector import Error
 from datetime import date 
 from datetime import datetime, timedelta
 import tournament
+import re
 from datetime import datetime   #Библиотеки
 
 def date(): #функция для вывода сегодняшней даты            
@@ -59,13 +60,13 @@ def check_exist_file(name):
 
 def insert_tournament(tournaments):
     for tour in tournaments:
-        query = "INSERT INTO tournament_go (t_start, t_end, t_name, city) VALUES(%s, %s, %s, %s)"
+        query = "INSERT INTO tournament_go (t_start, t_end, t_name, city, link) VALUES(%s, %s, %s, %s, %s)"
 
         try:
             dbconfig = read_db_config()
             conn = MySQLConnection(**dbconfig)
             cursor = conn.cursor()
-            cursor.execute(query, [tour.start, tour.end, tour.name, tour.city])
+            cursor.execute(query, [tour.start, tour.end, tour.name, tour.city, tour.link])
             conn.commit()
         except Error as e:
             print('Error:', e)
@@ -79,7 +80,7 @@ def main():
     insert_tournament(tournaments)
 
 def getText(): 
-    html = open('difference.html')
+    html = open('current.html')
     #open('tournament.html', 'w').close()
     root = BeautifulSoup(html, 'lxml')
     tr = root.select('tr')
@@ -88,6 +89,7 @@ def getText():
 
     for t in tr:
         td = t.select('td')
+        a = t.select('a')
         tour = tournament.Tournament()
 
         for i in td:
@@ -113,6 +115,9 @@ def getText():
                 tour.setName(t_name)
                 continue
 
+            link = "https://gofederation.ru" + i.previousSibling.next.attrs['href']
+            tour.setLink(link)
+            
             city = i.text
             tour.setCity(city)
 
@@ -145,7 +150,7 @@ def all_tournaments():
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
-        cursor.execute("SELECT t_start, t_end, t_name, city FROM tournament_go;")
+        cursor.execute("SELECT t_start, t_end, t_name, city, link FROM tournament_go;")
         all_tournaments = []
         result = cursor.fetchall()
         for item in result:
@@ -153,6 +158,7 @@ def all_tournaments():
             tournament += "Конец: " + str(item[1]) + "\n"
             tournament += "Название: " + item[2] + "\n"
             tournament += "Город: " + item[3] + "\n"
+            tournament += "Подробнее: " + item[4] + "\n"
             all_tournaments.append(tournament)
             
         conn.commit()
@@ -170,7 +176,7 @@ def weekend_tournaments():
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
-        cursor.execute("SELECT t_start, t_end, t_name, city FROM tournament_go;")
+        cursor.execute("SELECT t_start, t_end, t_name, city, link FROM tournament_go;")
         tournament = ""
         result = cursor.fetchall()
 
@@ -180,7 +186,7 @@ def weekend_tournaments():
                 tournament += "Конец: " + str(item[1]) + "\n"
                 tournament += "Название: " + item[2] + "\n"
                 tournament += "Город: " + item[3] + "\n"
-                tournament += "==============================" + "\n\n"
+                tournament += "Подробнее: " + item[4] + "\n\n"
                 if item[0] != get_saturday():
                     tournament += "На ближайших выходных турниров нет :("
 
@@ -260,7 +266,7 @@ def query_users(users):
 
 #if __name__ == '__main__':
 
-        #get_saturday()
+        #get_saturday()  https://gofederation.ru/tournaments/743315739
         #print("Получаем актуальную информацию о турнирах...")
         #download_page("https://gofederation.ru/tournaments/", "current.html")
         #print("Актуальная информация о турнирах получена...")

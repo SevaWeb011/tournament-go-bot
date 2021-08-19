@@ -4,6 +4,7 @@ class Tournament:
         self.end = ""
         self.name = ""
         self.city = ""
+        self.link = ""
 
     def setStart(self, start):
         self.start = start
@@ -16,3 +17,6 @@ class Tournament:
 
     def setCity(self, city):
         self.city = city
+
+    def setLink(self, link):
+        self.link = link    
