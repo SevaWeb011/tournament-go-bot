@@ -5,15 +5,12 @@ from mysql.connector import MySQLConnection
 from mysql_dbconfig import read_db_config
 from mysql.connector import Error
 from datetime import date 
-from datetime import datetime, timedelta
+from datetime import timedelta
 import tournament
-import re
 from datetime import datetime   #Библиотеки
 
 def date(): #функция для вывода сегодняшней даты            
     today = datetime.now().date()
-    #today = datetime.today().strftime('%Y-%m-%d')
-    #print(today)
     return today
 
 def download_page(url, name):  #функция для скачивания актуальной версии турниров по ссылке
@@ -21,7 +18,6 @@ def download_page(url, name):  #функция для скачивания ак�
     with open(name, 'w') as output_file:
         output_file.write(r.text.replace("&nbsp;-&nbsp;", "")) 
     r.close()
-
 
 def record_set(page): #функция, которая удаляет все переносы строк в файле (делает одну строку)
     with open(page, 'r') as f:
@@ -31,7 +27,6 @@ def record_set(page): #функция, которая удаляет все пе
         for item in soup.find_all("tr"):
             result_set.add(str(item))
         return result_set         
-
 
 def compare(current_page, old_page): #функция для сравнения старой версии турниров с новой, различия записываются в файл difference
     old_records = record_set(old_page)
@@ -52,11 +47,9 @@ def copy_current_to_old(old_page, current_page): # функция для пер�
             old.close()
             current.close()
 
-
 def check_exist_file(name):
     if not os.path.isfile(name):
         with open(name, 'w'): pass
-
 
 def insert_tournament(tournaments):
     for tour in tournaments:
@@ -80,7 +73,7 @@ def main():
     insert_tournament(tournaments)
 
 def getText(): 
-    html = open('current.html')
+    html = open('difference.html')
     #open('tournament.html', 'w').close()
     root = BeautifulSoup(html, 'lxml')
     tr = root.select('tr')
@@ -222,7 +215,6 @@ def get_saturday(): #эта функция получает дату суббо�
 
     return saturday
 
-
 def check_exist_user(chatID):
 
     query = "SELECT * FROM `user_BotGo` WHERE id_User='" + str(chatID) + "';"
@@ -243,13 +235,12 @@ def check_exist_user(chatID):
     finally:
         conn.close()
 
-
 def query_users(users):
 
     if check_exist_user(users[0]):
         return
 
-    query = "INSERT INTO user_BotGo (id_User, first_name, last_name, username) VALUES(%s, %s, %s, %s)"
+    query = "INSERT INTO user_BotGo (id_User, first_name, last_name, username, city, state_user) VALUES(%s, %s, %s, %s, %s, %s)"
     try:
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
@@ -263,10 +254,61 @@ def query_users(users):
         cursor.close()
         conn.close()
 
+def query_change_state(state, chatID):
+
+    query = "UPDATE user_BotGo SET state_user = '" + state + "' WHERE id_User = '" + str(chatID) + "'"
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute(query, state)
+        conn.commit()
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+
+def query_change_city(city, chatID):
+
+    query = "UPDATE user_BotGo SET city = '" + city + "' WHERE id_User = '" + str(chatID) + "'"
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute(query, city)
+        conn.commit()
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+
+def selectState():
+
+    SelectState = ""
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("SELECT state_user FROM user_BotGo")
+        records = cursor.fetchall()
+        SelectState = records[0][0]
+        conn.commit()
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+    return SelectState
+
+    
 
 #if __name__ == '__main__':
 
-        #get_saturday()  https://gofederation.ru/tournaments/743315739
         #print("Получаем актуальную информацию о турнирах...")
         #download_page("https://gofederation.ru/tournaments/", "current.html")
         #print("Актуальная информация о турнирах получена...")
@@ -274,10 +316,6 @@ def query_users(users):
         #print("Сравниваем изменения...")
         #compare("current.html", "old.html")
         #print("Сравнение изменений произведено...")
-
-        #print("Запись изменений...")
-        #check_exist_file("difference.html")
-        #print("Запись изменений получена...")
 
         #print("Перезапись...")
         #copy_current_to_old("old.html", "current.html")
@@ -287,7 +325,6 @@ def query_users(users):
         #main()
         #print("Ок..")
 
-        #weekend_tournaments()
         #delete_old_tournaments()
         #print("Готово")
 
