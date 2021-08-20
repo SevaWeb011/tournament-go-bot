@@ -286,14 +286,14 @@ def query_change_city(city, chatID):
         cursor.close()
         conn.close()
 
-def selectState():
+def selectState(chatID):
 
     SelectState = ""
     try:
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
-        cursor.execute("SELECT state_user FROM user_BotGo")
+        cursor.execute("SELECT state_user FROM user_BotGo WHERE id_User = '" + str(chatID) + "'")
         records = cursor.fetchall()
         SelectState = records[0][0]
         conn.commit()

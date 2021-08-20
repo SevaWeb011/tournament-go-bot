@@ -81,7 +81,7 @@ def start_message(message):
 def send_text(message):
 
     global state
-    SelectState = main.selectState()
+    SelectState = main.selectState(message.chat.id)
     if SelectState == "city_selection":
 
         if message.html_text == 'Москва, Моск.обл., Жуковский, Тула, Калуга, Калужская обл.':
@@ -95,153 +95,153 @@ def send_text(message):
             city = 'Санкт-Петербург, Всеволожск, Великий Новгород, Тверь'
             main.query_change_city(city, message.chat.id)
             state = "main"
-            main.query_change_state(state.message.chat.id)
+            main.query_change_state(state, message.chat.id)
             bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name)
                   
         if message.text == 'Казань':
             city = 'Казань'
             main.query_change_city(city, message.chat.id)
             state = "main"
-            main.query_change_state(state.message.chat.id)
+            main.query_change_state(state, message.chat.id)
             bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name)    
 
         if message.text == 'Нижний Новгород':
             city = 'Нижний Новгород'
             main.query_change_city(city, message.chat.id)
             state = "main"
-            main.query_change_state(state.message.chat.id)
+            main.query_change_state(state, message.chat.id)
             bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name)
 
         if message.text == 'Барнаул, Бийск':
             main.query_change_city(city, message.chat.id)
             state = "main"
-            main.query_change_state(state.message.chat.id)
+            main.query_change_state(state, message.chat.id)
             bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name)
 
         if message.text == 'Владивосток':
             city = 'Владивосток'
             main.query_change_city(city, message.chat.id)
             state = "main"
-            main.query_change_state(state.message.chat.id)
+            main.query_change_state(state, message.chat.id)
             bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name)
 
         if message.text == 'Екатеринбург':
             city = 'Екатеринбург'
             main.query_change_city(city, message.chat.id)
             state = "main"
-            main.query_change_state(state.message.chat.id)
+            main.query_change_state(state, message.chat.id)
             bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name)
 
         if message.text == 'Ижевск':
             city = 'Ижевск'
             main.query_change_city(city, message.chat.id)
             state = "main"
-            main.query_change_state(state.message.chat.id)
+            main.query_change_state(state, message.chat.id)
             bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name)
 
         if message.text == 'Калининград':
             city = 'Калининград'
             main.query_change_city(city, message.chat.id)
             state = "main"
-            main.query_change_state(state.message.chat.id)
+            main.query_change_state(state, message.chat.id)
             bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name)
 
         if message.text == 'Краснодар, Анапа, Сочи':
             city = 'Краснодар, Анапа, Сочи'
             main.query_change_city(city, message.chat.id)
             state = "main"
-            main.query_change_state(state.message.chat.id)
+            main.query_change_state(state, message.chat.id)
             bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name)
 
         if message.text == 'Магадан':
             city = 'Магадан'
             main.query_change_city(city, message.chat.id)
             state = "main"
-            main.query_change_state(state.message.chat.id)
+            main.query_change_state(state, message.chat.id)
             bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name)
 
         if message.text == 'Нижний Тагил':
             city = 'Нижний Тагил'
             main.query_change_city(city, message.chat.id)
             state = "main"
-            main.query_change_state(state.message.chat.id)
+            main.query_change_state(state, message.chat.id)
             bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name)
 
         if message.text == 'Николаевск-на-Амуре':
             city = 'Николаевск-на-Амуре'
             main.query_change_city(city, message.chat.id)
             state = "main"
-            main.query_change_state(state.message.chat.id)
+            main.query_change_state(state, message.chat.id)
             bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name)
 
         if message.text == 'Новосибирск':
             city = 'Новосибирск'
             main.query_change_city(city, message.chat.id)
             state = "main"
-            main.query_change_state(state.message.chat.id)
+            main.query_change_state(state, message.chat.id)
             bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name)
 
         if message.text == 'Омск':
             city = 'Омск'
             main.query_change_city(city, message.chat.id)
             state = "main"
-            main.query_change_state(state.message.chat.id)
+            main.query_change_state(state, message.chat.id)
             bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name)
 
         if message.text == 'Тверь':
             city = 'Тверь'
             main.query_change_city(city, message.chat.id)
             state = "main"
-            main.query_change_state(state.message.chat.id)
+            main.query_change_state(state, message.chat.id)
             bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name)
 
         if message.text == 'Пермь':
             city = 'Пермь'
             main.query_change_city(city, message.chat.id)
             state = "main"
-            main.query_change_state(state.message.chat.id)
+            main.query_change_state(state, message.chat.id)
             bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name)
 
         if message.text == 'Петрозаводск':
             city = 'Петрозаводск'
             main.query_change_city(city, message.chat.id)
             state = "main"
-            main.query_change_state(state.message.chat.id)
+            main.query_change_state(state, message.chat.id)
             bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name)
 
         if message.text == 'Ростов-на-Дону':
             city = 'Ростов-на-Дону'
             main.query_change_city(city, message.chat.id)
             state = "main"
-            main.query_change_state(state.message.chat.id)
+            main.query_change_state(state, message.chat.id)
             bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name)
 
         if message.text == 'Тюмень':
             city = 'Тюмень'
             main.query_change_city(city, message.chat.id)
             state = "main"
-            main.query_change_state(state.message.chat.id)
+            main.query_change_state(state, message.chat.id)
             bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name)
 
         if message.text == 'Хабаровск':
             city = 'Хабаровск'
             main.query_change_city(city, message.chat.id)
             state = "main"
-            main.query_change_state(state.message.chat.id)
+            main.query_change_state(state, message.chat.id)
             bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name)
 
         if message.text == 'Челябинск':
             city = 'Челябинск'
             main.query_change_city(city, message.chat.id)
             state = "main"
-            main.query_change_state(state.message.chat.id)
+            main.query_change_state(state, message.chat.id)
             bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name)
 
         if message.text == 'Якутск':
             city = 'Якутск'
             main.query_change_city(city, message.chat.id)
             state = "main"
-            main.query_change_state(state.message.chat.id)
+            main.query_change_state(state, message.chat.id)
             bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name)
 
     # if SelectState == "main":
