@@ -296,7 +296,6 @@ def selectState(chatID):
         cursor.execute("SELECT state_user FROM user_BotGo WHERE id_User = '" + str(chatID) + "'")
         records = cursor.fetchall()
         SelectState = records[0][0]
-        conn.commit()
     except Error as e:
         print('Error:', e)
 
@@ -305,7 +304,41 @@ def selectState(chatID):
         conn.close()
     return SelectState
 
-    
+def my_city(chatID):
+
+    my_city = ""
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("SELECT city FROM user_BotGo WHERE id_User = '" + str(chatID) + "'")
+        records = cursor.fetchall()
+        my_city = records[0][0]
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+    return my_city
+
+def tournaments_in_my_city(chatID, city):
+    my_city = my_city(chatID)
+    tournaments_in_my_city = ""
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM tournament_go WHERE city LIKE '" + str(my_city) + "'")
+        records = cursor.fetchall()
+        tournaments_in_my_city = records[0][0]
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+    return tournaments_in_my_city
 
 #if __name__ == '__main__':
 
