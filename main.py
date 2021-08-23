@@ -164,6 +164,31 @@ def all_tournaments():
         conn.close()
         return all_tournaments
 
+
+
+def all_cities():
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("SELECT title FROM Cities;")
+        cities = []
+        result = cursor.fetchall()
+        for item in result:
+            city = str(item[0])
+            cities.append(city)
+        conn.commit()
+            
+        print()
+
+    except Error as e:
+        print(e)
+
+    finally:
+        cursor.close()
+        conn.close()
+        return cities
+
 def weekend_tournaments():
     try:
         dbconfig = read_db_config()
@@ -341,7 +366,7 @@ def tournaments_in_my_city(chatID, city):
     return tournaments_in_my_city
 
 #if __name__ == '__main__':
-
+        #all_cities()
         #print("Получаем актуальную информацию о турнирах...")
         #download_page("https://gofederation.ru/tournaments/", "current.html")
         #print("Актуальная информация о турнирах получена...")

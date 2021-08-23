@@ -66,6 +66,7 @@ def message(message):
     SelectState = main.selectState(message.chat.id)
 
     if SelectState == "city_selection":
+        
         if message.text.lower() == "/start":
             bot.send_message(message.chat.id, 'Привет, выбери город 🏘 или группу городов, в котором ты живешь. Если твоего города нет 😔, выбери того, что ближе всего. Я буду уведомлять тебя о новых турнирах 😉', reply_markup = markup)
 
@@ -236,6 +237,10 @@ def message(message):
         if message.text.lower() == "/tournaments":
             for tournament in main.all_tournaments():
                 bot.send_message(message.chat.id, '🏆 \n' + tournament)
+
+        if message.text.lower() == "город":
+            for city in main.all_cities():
+                bot.send_message(message.chat.id, city)
 
         if message.text.lower() == "/weekend_tournaments":
             bot.send_message(message.chat.id, 'Турниры на выходные 👀 ... \n\n' + main.weekend_tournaments())
