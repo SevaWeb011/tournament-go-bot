@@ -164,8 +164,6 @@ def all_tournaments():
         conn.close()
         return all_tournaments
 
-
-
 def all_cities():
     try:
         dbconfig = read_db_config()
@@ -265,7 +263,7 @@ def query_users(users):
     if check_exist_user(users[0]):
         return
 
-    query = "INSERT INTO user_BotGo (id_User, first_name, last_name, username, city, state_user) VALUES(%s, %s, %s, %s, %s, %s)"
+    query = "INSERT INTO user_BotGo (id_User, first_name, last_name, username, state_user) VALUES( %s, %s, %s, %s, %s)"
     try:
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
@@ -295,14 +293,14 @@ def query_change_state(state, chatID):
         cursor.close()
         conn.close()
 
-def query_change_city(city, chatID):
+def add_city(chatID, city):
 
-    query = "UPDATE user_BotGo SET city = '" + city + "' WHERE id_User = '" + str(chatID) + "'"
+    #query = "INSERT INTO UserCity (id_user, city) VALUES ('" + str(chatID) + "', '" + str(city) + "');"
     try:
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
-        cursor.execute(query, city)
+        cursor.execute("INSERT INTO UserCity (id_user, city) VALUES ('" + str(chatID) + "', '" + str(city) + "');")
         conn.commit()
     except Error as e:
         print('Error:', e)
@@ -347,43 +345,45 @@ def my_city(chatID):
         conn.close()
     return my_city
 
-def tournaments_in_my_city(chatID, city):
-    my_city = my_city(chatID)
-    tournaments_in_my_city = ""
+def get_all_cities():
+
+    all_city = []
     try:
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM tournament_go WHERE city LIKE '" + str(my_city) + "'")
+        cursor.execute("SELECT title FROM `Cities`;")
         records = cursor.fetchall()
-        tournaments_in_my_city = records[0][0]
+        for city in records:
+            all_city.append(city[0])
+
     except Error as e:
         print('Error:', e)
 
     finally:
         cursor.close()
         conn.close()
-    return tournaments_in_my_city
+    return all_city
 
 #if __name__ == '__main__':
-        #all_cities()
-        #print("Получаем актуальную информацию о турнирах...")
-        #download_page("https://gofederation.ru/tournaments/", "current.html")
-        #print("Актуальная информация о турнирах получена...")
+    
+#         print("Получаем актуальную информацию о турнирах...")
+#         download_page("https://gofederation.ru/tournaments/", "current.html")
+#         print("Актуальная информация о турнирах получена...")
 
-        #print("Сравниваем изменения...")
-        #compare("current.html", "old.html")
-        #print("Сравнение изменений произведено...")
+#         print("Сравниваем изменения...")
+#         compare("current.html", "old.html")
+#         print("Сравнение изменений произведено...")
 
-        #print("Перезапись...")
-        #copy_current_to_old("old.html", "current.html")
-        #print("Готово")
+#         print("Перезапись...")
+#         copy_current_to_old("old.html", "current.html")
+#         print("Готово")
 
-        #print("Получение результата запроса...")
-        #main()
-        #print("Ок..")
+#         print("Получение результата запроса...")
+#         main()
+#         print("Ок..")
 
-        #delete_old_tournaments()
-        #print("Готово")
+#         delete_old_tournaments()
+#         print("Готово")
 
          
