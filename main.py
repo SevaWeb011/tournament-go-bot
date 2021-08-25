@@ -182,16 +182,6 @@ def all_tournaments_in_city(chatID): #выполняет запрос на вы�
                 tournament += "Подробнее: " + res[4] + "\n"
                 all_tournaments.append(tournament)
 
-        # for city in my_city(chatID):
-        #     if city[0] == result[0][3]:
-        #         for item in result:
-        #             tournament = "Начало: " + str(item[0]) + "\n"
-        #             tournament += "Конец: " + str(item[1]) + "\n"
-        #             tournament += "Название: " + item[2] + "\n"
-        #             tournament += "Город: " + item[3] + "\n"
-        #             tournament += "Подробнее: " + item[4] + "\n"
-        #             all_tournaments.append(tournament)
-            
         conn.commit()
 
     except Error as e:
@@ -397,8 +387,6 @@ def tournaments_in_my_city(chatID):
         cursor.close()
         conn.close()
     return tournament_in_my_city
-
-
 
 # if __name__ == '__main__':
     
