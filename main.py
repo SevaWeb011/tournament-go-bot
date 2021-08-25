@@ -47,11 +47,11 @@ def copy_current_to_old(old_page, current_page): # функция для пер�
             old.close()
             current.close()
 
-def check_exist_file(name):
+def check_exist_file(name): #
     if not os.path.isfile(name):
         with open(name, 'w'): pass
 
-def insert_tournament(tournaments):
+def insert_tournament(tournaments): #добавляет турниры в базу данных
     for tour in tournaments:
         query = "INSERT INTO tournament_go (t_start, t_end, t_name, city, link) VALUES(%s, %s, %s, %s, %s)"
 
@@ -68,17 +68,15 @@ def insert_tournament(tournaments):
             cursor.close()
             conn.close()
 
-def main():
+def main(): #связывает 2 функции insert_tournament и getText
     tournaments = getText()
     insert_tournament(tournaments)
 
-def getText(): 
+def getText(): #получает текст для вставки новях турниров в базу данных
     html = open('difference.html')
-    #open('tournament.html', 'w').close()
     root = BeautifulSoup(html, 'lxml')
     tr = root.select('tr')
     tournaments = []
-    #with open('tournament.html', 'w') as f: 
 
     for t in tr:
         td = t.select('td')
@@ -119,7 +117,7 @@ def getText():
 
     return tournaments
 
-def delete_old_tournaments():
+def delete_old_tournaments(): #удаляет старые турниры, у которых дата старта меньше тукущей даты
     try:
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
@@ -138,7 +136,7 @@ def delete_old_tournaments():
         cursor.close()
         conn.close()
 
-def all_tournaments():
+def all_tournaments(): #выполняет запрос на вывод пользователю всех туниров
     try:
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
@@ -164,20 +162,37 @@ def all_tournaments():
         conn.close()
         return all_tournaments
 
-def all_cities():
+def all_tournaments_in_city(chatID): #выполняет запрос на вывод пользователю всех туниров в его городе
     try:
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
-        cursor.execute("SELECT title FROM Cities;")
-        cities = []
+        cursor.execute("SELECT t_start, t_end, t_name, city, link FROM tournament_go;")
+        all_tournaments = []
         result = cursor.fetchall()
-        for item in result:
-            city = str(item[0])
-            cities.append(city)
-        conn.commit()
+
+        city_user = my_city(chatID)
+
+        for res in result:
+            if res[3] in city_user:
+                tournament = "Начало: " + str(res[0]) + "\n"
+                tournament += "Конец: " + str(res[1]) + "\n"
+                tournament += "Название: " + res[2] + "\n"
+                tournament += "Город: " + res[3] + "\n"
+                tournament += "Подробнее: " + res[4] + "\n"
+                all_tournaments.append(tournament)
+
+        # for city in my_city(chatID):
+        #     if city[0] == result[0][3]:
+        #         for item in result:
+        #             tournament = "Начало: " + str(item[0]) + "\n"
+        #             tournament += "Конец: " + str(item[1]) + "\n"
+        #             tournament += "Название: " + item[2] + "\n"
+        #             tournament += "Город: " + item[3] + "\n"
+        #             tournament += "Подробнее: " + item[4] + "\n"
+        #             all_tournaments.append(tournament)
             
-        print()
+        conn.commit()
 
     except Error as e:
         print(e)
@@ -185,9 +200,9 @@ def all_cities():
     finally:
         cursor.close()
         conn.close()
-        return cities
+        return all_tournaments
 
-def weekend_tournaments():
+def weekend_tournaments(): #выполняет запрос на вывод пользователю турниров, которые состоятся на выходных текущей недели
     try:
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
@@ -238,7 +253,7 @@ def get_saturday(): #эта функция получает дату суббо�
 
     return saturday
 
-def check_exist_user(chatID):
+def check_exist_user(chatID): #проверка записи пользователя, чтобы не записывался один пользователь несколько раз
 
     query = "SELECT * FROM `user_BotGo` WHERE id_User='" + str(chatID) + "';"
     try:
@@ -258,7 +273,7 @@ def check_exist_user(chatID):
     finally:
         conn.close()
 
-def query_users(users):
+def query_users(users): #выполнение запроса на заполнение данных о пользователе
 
     if check_exist_user(users[0]):
         return
@@ -277,7 +292,7 @@ def query_users(users):
         cursor.close()
         conn.close()
 
-def query_change_state(state, chatID):
+def query_change_state(state, chatID): #запрос на смену состояния пользователя
 
     query = "UPDATE user_BotGo SET state_user = '" + state + "' WHERE id_User = '" + str(chatID) + "'"
     try:
@@ -293,9 +308,8 @@ def query_change_state(state, chatID):
         cursor.close()
         conn.close()
 
-def add_city(chatID, city):
+def add_city(chatID, city): #запрос на добавления пользователю города, в которых он хочет получать информацию о новых турнирах
 
-    #query = "INSERT INTO UserCity (id_user, city) VALUES ('" + str(chatID) + "', '" + str(city) + "');"
     try:
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
@@ -309,7 +323,7 @@ def add_city(chatID, city):
         cursor.close()
         conn.close()
 
-def selectState(chatID):
+def selectState(chatID): #проверка состояния пользователя
 
     SelectState = ""
     try:
@@ -327,16 +341,18 @@ def selectState(chatID):
         conn.close()
     return SelectState
 
-def my_city(chatID):
+def my_city(chatID): ####
 
     my_city = ""
     try:
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
-        cursor.execute("SELECT city FROM user_BotGo WHERE id_User = '" + str(chatID) + "'")
+        cursor.execute("SELECT city FROM UserCity WHERE id_user = '" + str(chatID) + "'")
         records = cursor.fetchall()
-        my_city = records[0][0]
+        my_city = []
+        for item in records:
+            my_city.append(item[0])
     except Error as e:
         print('Error:', e)
 
@@ -345,7 +361,7 @@ def my_city(chatID):
         conn.close()
     return my_city
 
-def get_all_cities():
+def get_all_cities(): #запрос на получение списка городов
 
     all_city = []
     try:
@@ -365,7 +381,26 @@ def get_all_cities():
         conn.close()
     return all_city
 
-#if __name__ == '__main__':
+def tournaments_in_my_city(chatID):
+    tournament_in_my_city = ""
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("SELECT city FROM UserCity WHERE id_user = '" + str(chatID) + "'")
+        records = cursor.fetchall()
+        tournament_in_my_city = records
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+    return tournament_in_my_city
+
+
+
+# if __name__ == '__main__':
     
 #         print("Получаем актуальную информацию о турнирах...")
 #         download_page("https://gofederation.ru/tournaments/", "current.html")

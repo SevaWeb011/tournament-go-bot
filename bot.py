@@ -7,6 +7,8 @@ bot_config = read_bot_config()
 token = bot_config['token']
 bot = telebot.TeleBot(token)
 state = "city_selection"
+global listCity
+listCity = []
 
 @bot.message_handler(content_types=['text'])
 def message(message):
@@ -33,28 +35,27 @@ def message(message):
 
     SelectState = main.selectState(message.chat.id)
 
+
     if SelectState == "city_selection":
 
-        all_city = main.get_all_cities()
+        all_city = sorted(set(main.get_all_cities()) - set(listCity))
         for city in all_city:
             towns.add(types.KeyboardButton(city))
-        
+
         if message.text.lower() == "/start":
             bot.send_message(message.chat.id, 'Привет, выбери город 🏘, в котором ты хочешь получать уведомления о турнирах 😉', reply_markup=towns)
-            
+
         if message.html_text in all_city:
             main.add_city(message.chat.id, message.html_text)
+            listCity.append(message.html_text)
             bot.send_message(message.chat.id, 'Если хочешь выбрать еще города, нажми ДАЛЕЕ, если нет, то нажми СТОП', reply_markup=navigation)
-            
+
         if message.html_text == 'далее':
             bot.send_message(message.chat.id, 'Выбери город', reply_markup=towns)
 
         if message.html_text == 'стоп':
             main.query_change_state("main", message.chat.id)
             bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name, reply_markup=types.ReplyKeyboardRemove())
-
-               
-
 
     if SelectState == "main":
         if message.text.lower() == "/start":
@@ -64,22 +65,18 @@ def message(message):
             for tournament in main.all_tournaments():
                 bot.send_message(message.chat.id, '🏆 \n' + tournament)
 
-        if message.text.lower() == "город":
-            for city in main.all_cities():
-                bot.send_message(message.chat.id, city)
-
         if message.text.lower() == "/weekend_tournaments":
             bot.send_message(message.chat.id, 'Турниры на выходные 👀 ... \n\n' + main.weekend_tournaments())
 
         if message.text.lower() == "/my_city":
-            bot.send_message(message.chat.id, 'Твой город:  ' + main.my_city(message.chat.id))
+           for city in main.my_city(message.chat.id):
+               bot.send_message(message.chat.id, city)
 
-        # if message.text.lower() == "/tournaments_in_my_city":
-        #     myCity = main.my_city(message.chat.id))
-        #     bot.send_message(message.chat.id, 'Турниры твоего города: ' + main.tournaments_in_my_city(message.chat.id, myCity))
+        if message.text.lower() == "/tournaments_in_my_city":
+           for tournament in main.all_tournaments_in_city(message.chat.id):
+                bot.send_message(message.chat.id, '🏆 \n' + tournament)
 
-        # state = "main"
-        #     main.query_change_state(state, message.chat.id)
+        print()
 
 if __name__ == '__main__':
     bot.polling()
