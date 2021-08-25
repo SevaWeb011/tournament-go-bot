@@ -109,7 +109,7 @@ def getText(): #получает текст для вставки новях т�
             link = "https://gofederation.ru" + i.previousSibling.next.attrs['href']
             tour.setLink(link)
             
-            city = i.text
+            city = i.text.replace("Сервер", "")
             tour.setCity(city)
 
         if tour.name != "":
