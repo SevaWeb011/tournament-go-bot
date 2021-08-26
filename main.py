@@ -388,25 +388,131 @@ def tournaments_in_my_city(chatID):
         conn.close()
     return tournament_in_my_city
 
+def insert_NEW_tournament(tournaments): #функция записывает новые турниры в таблицу НОВЫЕ турниры го, рассылает, записывает в обычную таблицу, удаляет из новых турниров 
+    for tour in tournaments:
+        query = "INSERT INTO NEW_tournament_go (t_start, t_end, t_name, city, link) VALUES(%s, %s, %s, %s, %s)"
+
+        try:
+            dbconfig = read_db_config()
+            conn = MySQLConnection(**dbconfig)
+            cursor = conn.cursor()
+            cursor.execute(query, [tour.start, tour.end, tour.name, tour.city, tour.link])
+            conn.commit()
+        except Error as e:
+            print('Error:', e)
+
+        finally:
+            cursor.close()
+            conn.close()
+
+def main_NEW(): #связывает 2 функции insert_NEW_tournament и getText
+    tournaments = getText()
+    insert_NEW_tournament(tournaments)
+
+def all_cities_from_new_tournaments():
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("SELECT city FROM NEW_tournament_go")
+        result = cursor.fetchall()
+        conn.commit()
+
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+        return result
+
+def user_cities():
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("SELECT city FROM UserCity")
+        result = cursor.fetchall()
+        conn.commit()
+
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+        return result
+
+def id_user_where_city_in_NEW():
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("SELECT id_user FROM UserCity WHERE city in (SELECT city FROM NEW_tournament_go)")
+        result = cursor.fetchall()
+        conn.commit()
+
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+        return result
+
+def all_tournaments_in_city_NEW(chatID): #выполняет запрос на вывод пользователю всех туниров в его городе
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("SELECT t_start, t_end, t_name, city, link FROM NEW_tournament_go;")
+        all_tournaments = []
+        result = cursor.fetchall()
+
+        city_user = my_city(chatID)
+
+        for res in result:
+            if res[3] in city_user:
+                tournament = "Начало: " + str(res[0]) + "\n"
+                tournament += "Конец: " + str(res[1]) + "\n"
+                tournament += "Название: " + res[2] + "\n"
+                tournament += "Город: " + res[3] + "\n"
+                tournament += "Подробнее: " + res[4] + "\n"
+                all_tournaments.append(tournament)
+
+        conn.commit()
+
+    except Error as e:
+        print(e)
+
+    finally:
+        cursor.close()
+        conn.close()
+        return all_tournaments
+
+def delete_all_from_NEW():
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM NEW_tournament_go")
+        conn.commit()
+
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+
+
 # if __name__ == '__main__':
     
-#         print("Получаем актуальную информацию о турнирах...")
 #         download_page("https://gofederation.ru/tournaments/", "current.html")
-#         print("Актуальная информация о турнирах получена...")
-
-#         print("Сравниваем изменения...")
 #         compare("current.html", "old.html")
-#         print("Сравнение изменений произведено...")
-
-#         print("Перезапись...")
 #         copy_current_to_old("old.html", "current.html")
-#         print("Готово")
-
-#         print("Получение результата запроса...")
 #         main()
-#         print("Ок..")
-
 #         delete_old_tournaments()
-#         print("Готово")
+
 
          

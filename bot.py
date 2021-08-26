@@ -31,10 +31,8 @@ def message(message):
     ]
 
     main.query_users(users)
-  
 
     SelectState = main.selectState(message.chat.id)
-
 
     if SelectState == "city_selection":
 
@@ -76,7 +74,46 @@ def message(message):
            for tournament in main.all_tournaments_in_city(message.chat.id):
                 bot.send_message(message.chat.id, '🏆 \n' + tournament)
 
-        print()
+        if message.text.lower() == "/message_to_developer":
+            main.query_change_state("message_to_developer", message.chat.id)
+            SelectState = main.selectState(message.chat.id)
+            bot.send_message(message.chat.id, 'Напиши разработчику об ошибках, неисправностях, и тп')
+            bot.send_message(message.chat.id, 'Отправь сюда сообщение, чтобы я отправил его разработчику')
+        
+    if SelectState == "message_to_developer" and message.text.lower() != "/message_to_developer":
+        bot.send_message(925936432, "Сообщение от " + message.chat.first_name + " " +  message.chat.username + "\n" + message.html_text)
+        bot.send_message(message.chat.id, "Отправил")
+        main.query_change_state("main", message.chat.id)
+        bot.send_message(message.chat.id, 'Если хочешь еще раз написать разработчику, напиши команду /message_to_developer')
+
+def push_message():
+    # если выборка city из таблицы NEW_tournament_go 
+# есть (in) в выборке города из таблицы UserCity 
+# то выполнить запрос к таблице UserCity 
+# (выбрать id_user где city = city из таблицы NEW_tournament_go) 
+# отправить этому id сообщение о турнире
+    for city in main.all_cities_from_new_tournaments():
+        if city in main.user_cities():
+            for user in main.id_user_where_city_in_NEW():
+                all_tournaments = main.all_tournaments_in_city_NEW(user[0])
+                for tournament in all_tournaments:
+                    bot.send_message(user[0], "В твоем городе появился турнир \n" + tournament)
+
+
+    #for tournament in main.all_tournaments_in_city(message.chat.id):
+        #bot.send_message(message.chat.id, '🏆 \n' + tournament)
 
 if __name__ == '__main__':
     bot.polling()
+
+    while True:
+        main.download_page("https://gofederation.ru/tournaments/", "current.html") #скачивание актуальной версии терниров
+        main.compare("current.html", "old.html") #сравнение
+        main.copy_current_to_old("old.html", "current.html") #замена старого на новое
+        main.main_NEW() #запись новых турниров
+        push_message() #уведомление пользователей о новых турнирах
+        main.delete_all_from_NEW #удаление турниров из новых
+        main.main() #добавление новых турниров в основную таблицу
+        main.delete_old_tournaments() #удаление устаревших по дате турниров из основной таблицы
+
+    time.sleep(60)
