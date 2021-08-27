@@ -465,20 +465,20 @@ def all_tournaments_in_city_NEW(chatID): #выполняет запрос на �
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
-        cursor.execute("SELECT t_start, t_end, t_name, city, link FROM NEW_tournament_go;")
+        cursor.execute("SELECT id, t_start, t_end, t_name, city, link FROM NEW_tournament_go;")
         all_tournaments = []
         result = cursor.fetchall()
 
         city_user = my_city(chatID)
 
         for res in result:
-            if res[3] in city_user:
-                tournament = "Начало: " + str(res[0]) + "\n"
-                tournament += "Конец: " + str(res[1]) + "\n"
-                tournament += "Название: " + res[2] + "\n"
-                tournament += "Город: " + res[3] + "\n"
-                tournament += "Подробнее: " + res[4] + "\n"
-                all_tournaments.append(tournament)
+            if res[4] in city_user:
+                tournament = "Начало: " + str(res[1]) + "\n"
+                tournament += "Конец: " + str(res[2]) + "\n"
+                tournament += "Название: " + res[3] + "\n"
+                tournament += "Город: " + res[4] + "\n"
+                tournament += "Подробнее: " + res[5] + "\n"
+                all_tournaments.append([res[0], tournament])
 
         conn.commit()
 
@@ -505,6 +505,53 @@ def delete_all_from_NEW():
         cursor.close()
         conn.close()
 
+def message_was_send(userID, tournament):
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO message_was_send (id_user, tournament) VALUES ('" + str(userID) + "', '" + str(tournament) + "')")
+        conn.commit()
+
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+
+def Select_message_was_send(userID, tournament):
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        query = "SELECT id_user, tournament FROM message_was_send WHERE id_user = '" + str(userID) + "' AND tournament = '" + str(tournament) + "';"
+        cursor.execute(query)
+        result = cursor.fetchall()
+        conn.commit()
+
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+        return result
+
+def del_message_was_send():
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM message_was_send")
+        conn.commit()
+
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
 
 # if __name__ == '__main__':
     

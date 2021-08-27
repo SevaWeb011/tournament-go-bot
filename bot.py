@@ -1,3 +1,7 @@
+import time
+
+from threading import Thread
+
 import telebot
 from telebot import types
 import main
@@ -97,23 +101,26 @@ def push_message():
             for user in main.id_user_where_city_in_NEW():
                 all_tournaments = main.all_tournaments_in_city_NEW(user[0])
                 for tournament in all_tournaments:
-                    bot.send_message(user[0], "В твоем городе появился турнир \n" + tournament)
+                    result = main.Select_message_was_send(user[0], tournament[0])
+                    if len(result) == 0:
+                        bot.send_message(user[0], "В твоем городе появился турнир \n" + tournament[1])
+                        main.message_was_send(user[0], tournament[0])
 
-
-    #for tournament in main.all_tournaments_in_city(message.chat.id):
-        #bot.send_message(message.chat.id, '🏆 \n' + tournament)
+def background():
+    while True:
+        main.download_page("https://gofederation.ru/tournaments/", "current.html"),  # скачивание актуальной версии терниров
+        main.compare("current.html", "old.html"),  # сравнение
+        main.copy_current_to_old("old.html", "current.html"),  # замена старого на новое
+        main.main_NEW(),  # запись новых турниров
+        push_message(),  # уведомление пользователей о новых турнирах
+        main.delete_all_from_NEW(),  # удаление турниров из новых
+        main.del_message_was_send(),  # очистка отправленных сообщений
+        main.main(),  # добавление новых турниров в основную таблицу
+        main.delete_old_tournaments()  # удаление устаревших по дате турниров из основной таблицы
+        time.sleep(21600)
 
 if __name__ == '__main__':
+
+    t1 = Thread(target=background, args=())
+    t1.start()
     bot.polling()
-
-    while True:
-        main.download_page("https://gofederation.ru/tournaments/", "current.html") #скачивание актуальной версии терниров
-        main.compare("current.html", "old.html") #сравнение
-        main.copy_current_to_old("old.html", "current.html") #замена старого на новое
-        main.main_NEW() #запись новых турниров
-        push_message() #уведомление пользователей о новых турнирах
-        main.delete_all_from_NEW #удаление турниров из новых
-        main.main() #добавление новых турниров в основную таблицу
-        main.delete_old_tournaments() #удаление устаревших по дате турниров из основной таблицы
-
-    time.sleep(60)
