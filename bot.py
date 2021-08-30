@@ -1,14 +1,11 @@
+import os
 import time
-
 from threading import Thread
-
 import telebot
 from telebot import types
 import main
-from bot_config import read_bot_config
 
-bot_config = read_bot_config()
-token = bot_config['token']
+token = os.getenv("BOT")
 bot = telebot.TeleBot(token)
 state = "city_selection"
 global listCity
