@@ -1,9 +1,11 @@
 import os
 import time
+import threading
 from threading import Thread
 import telebot
 from telebot import types
 import main
+
 
 token = os.getenv("BOT")
 bot = telebot.TeleBot(token)
@@ -42,7 +44,7 @@ def message(message):
             towns.add(types.KeyboardButton(city))
 
         if message.text.lower() == "/start":
-            bot.send_message(message.chat.id, 'Привет, выбери город 🏘, в котором ты хочешь получать уведомления о турнирах 😉', reply_markup=towns)
+            bot.send_message(message.chat.id, 'Привет, выбери города 🏘, в которых турниры актуальны для тебя 😉', reply_markup=towns)
 
         if message.html_text in all_city:
             main.add_city(message.chat.id, message.html_text)
@@ -51,35 +53,44 @@ def message(message):
 
         if message.html_text == 'далее':
             bot.send_message(message.chat.id, 'Выбери город', reply_markup=towns)
-
+       
         if message.html_text == 'стоп':
             main.query_change_state("main", message.chat.id)
             bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name, reply_markup=types.ReplyKeyboardRemove())
+       
 
     if SelectState == "main":
         if message.text.lower() == "/start":
             bot.send_message(message.chat.id, 'Здравствуй, ' + message.chat.first_name)
-
+            return
+       
         if message.text.lower() == "/tournaments":
             for tournament in main.all_tournaments():
                 bot.send_message(message.chat.id, '🏆 \n' + tournament)
-
+            return
+        
         if message.text.lower() == "/weekend_tournaments":
             bot.send_message(message.chat.id, 'Турниры на выходные 👀 ... \n\n' + main.weekend_tournaments())
+            return
 
         if message.text.lower() == "/my_city":
-           for city in main.my_city(message.chat.id):
-               bot.send_message(message.chat.id, city)
-
+            for city in main.my_city(message.chat.id):
+                bot.send_message(message.chat.id, city)
+            return
+        
         if message.text.lower() == "/tournaments_in_my_city":
            for tournament in main.all_tournaments_in_city(message.chat.id):
                 bot.send_message(message.chat.id, '🏆 \n' + tournament)
+           return
 
         if message.text.lower() == "/message_to_developer":
             main.query_change_state("message_to_developer", message.chat.id)
             SelectState = main.selectState(message.chat.id)
-            bot.send_message(message.chat.id, 'Напиши разработчику об ошибках, неисправностях, и тп')
-            bot.send_message(message.chat.id, 'Отправь сюда сообщение, чтобы я отправил его разработчику')
+            bot.send_message(message.chat.id, 'Напиши разработчику об ошибках, неисправностях, и тп. Отправь сюда сообщение, чтобы я отправил его разработчику')
+            return
+
+        else: 
+            bot.send_message(message.chat.id, 'Я тебя не понимаю, напиши что-нибудь другое :(')
         
     if SelectState == "message_to_developer" and message.text.lower() != "/message_to_developer":
         bot.send_message(925936432, "Сообщение от " + message.chat.first_name + " " +  message.chat.username + "\n" + message.html_text)
@@ -114,10 +125,13 @@ def background():
         main.del_message_was_send(),  # очистка отправленных сообщений
         main.main(),  # добавление новых турниров в основную таблицу
         main.delete_old_tournaments()  # удаление устаревших по дате турниров из основной таблицы
-        time.sleep(21600)
+
+        time.sleep(60)
+    
 
 if __name__ == '__main__':
 
     t1 = Thread(target=background, args=())
     t1.start()
-    bot.polling()
+    
+    bot.polling(none_stop=True)

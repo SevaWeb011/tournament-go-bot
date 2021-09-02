@@ -1,0 +1,38 @@
+---
+- name: tournament_go
+  hosts: all
+  become: yes
+  
+  pre_tasks:
+
+  - name: install 
+    apt: 
+      name: 
+        - sudo 
+        - python3-pip
+        - python3-jmespath
+        - ca-certificates
+        - curl
+        - gnupg2
+        - lsb-release
+        - python-pip
+        - python-setuptools
+        - docker
+      update_cache: yes
+  - name: docker
+    command: pip3 install docker
+
+  tasks:
+
+  - name: pull an image
+    docker_image:
+      name: foilv/tournaments_go
+      source: pull
+
+  roles:
+    - geerlingguy.docker
+    - geerlingguy.mysql
+
+
+
+        
