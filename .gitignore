@@ -1,6 +1,6 @@
 config.ini
-current.html
-difference.html
+BOT/current.html
+BOT/difference.html
 tournament.html
 token_bot.py
 test.py

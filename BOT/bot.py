@@ -141,4 +141,4 @@ if __name__ == '__main__':
     t1 = Thread(target=background, args=())
     t1.start()
     
-    bot.polling(none_stop=True)
+    bot.polling()
