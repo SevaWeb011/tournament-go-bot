@@ -1,0 +1,8 @@
+.gitignore
+current.html
+difference.html
+Dockerfile
+playbook.yml
+secrets.yml
+.vagrant
+Vagrantfile

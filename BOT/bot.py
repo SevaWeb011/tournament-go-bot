@@ -89,6 +89,13 @@ def message(message):
             bot.send_message(message.chat.id, 'Напиши разработчику об ошибках, неисправностях, и тп. Отправь сюда сообщение, чтобы я отправил его разработчику')
             return
 
+        if message.text.lower() == "/change_city":
+            main.remove_city_for_user(message.chat.id)
+            main.query_change_state("city_selection", message.chat.id)
+            SelectState = main.selectState(message.chat.id)
+            bot.send_message(message.chat.id, 'Я очистил твои города, выбирай новые', reply_markup=towns)
+            return
+
         else: 
             bot.send_message(message.chat.id, 'Я тебя не понимаю, напиши что-нибудь другое :(')
         

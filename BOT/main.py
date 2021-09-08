@@ -553,6 +553,21 @@ def del_message_was_send():
         cursor.close()
         conn.close()
 
+def remove_city_for_user(userID):
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM UserCity WHERE id_user=" + str(userID))
+        conn.commit()
+
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+
 # if __name__ == '__main__':
     
 #         download_page("https://gofederation.ru/tournaments/", "current.html")

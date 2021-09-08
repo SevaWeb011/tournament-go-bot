@@ -29,10 +29,47 @@
       name: foilv/tournaments_go
       source: pull
 
+  - name: make dirs 0777   
+    command: sudo chmod 777 /var/run/docker.sock
+
+  - name: create database 
+    community.mysql.mysql_db:
+      login_user: root
+      login_password: root
+      name: tournament_go
+      state: present
+
+  - name: Copy database dump file
+    copy:
+      src: tournament_go.sql
+      dest: /tmp
+
+  - name: Restore database ignoring errors
+    community.mysql.mysql_db:
+      name: tournament_go
+      state: import
+      target: /tmp/tournament_go.sql
+
+  - name: Create database user 
+    community.mysql.mysql_user:
+      name: foilv
+      password: 12345
+      priv: '*.*:ALL,GRANT'
+      host: '%'
+      state: present
+
+  - name: start a container
+    community.docker.docker_container:
+      name: myapplication
+      image: foilv/tournaments_go
+      state: started
+      env: 
+        HOST: "192.168.3.223" 
+        DATABASE: "tournament_go"
+        USER: "foilv"
+        PASSWORD: "12345"
+        BOT: ""
+
   roles:
     - geerlingguy.docker
     - geerlingguy.mysql
-
-
-
-        

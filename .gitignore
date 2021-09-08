@@ -6,3 +6,8 @@ token_bot.py
 test.py
 _pycache_
 tournament_go.sql
+.vagrant
+secrets.yml
+Dockerfile
+playbook.yml
+Vagrantfile
