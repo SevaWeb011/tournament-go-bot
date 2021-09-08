@@ -4,7 +4,7 @@ BOT/difference.html
 tournament.html
 token_bot.py
 test.py
-_pycache_
+__pycache__
 tournament_go.sql
 .vagrant
 secrets.yml
