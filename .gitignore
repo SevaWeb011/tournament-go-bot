@@ -11,3 +11,4 @@ secrets.yml
 Dockerfile
 playbook.yml
 Vagrantfile
+.idea
