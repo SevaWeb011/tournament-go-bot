@@ -553,7 +553,7 @@ def del_message_was_send():
         cursor.close()
         conn.close()
 
-def remove_city_for_user(userID): 
+def remove_city_for_user(userID): #test
     try:
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
