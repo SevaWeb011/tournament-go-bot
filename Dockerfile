@@ -10,4 +10,4 @@ WORKDIR /app
 
 ENTRYPOINT ["python"]
 
-CMD ["bot.py"]
+CMD ["BOT/bot.py"] 
