@@ -121,7 +121,7 @@ def push_message():
                         bot.send_message(user[0], "В твоем городе появился турнир \n" + tournament[1])
                         main.message_was_send(user[0], tournament[0])
 
-def background():#test
+def background():#test 9
     while True:
         main.download_page("https://gofederation.ru/tournaments/", "current.html"),  # скачивание актуальной версии терниров
         main.compare("current.html", "old.html"),  # сравнение
