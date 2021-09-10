@@ -28,6 +28,6 @@ jobs:
           file: ./Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/tournament_go
+          tags: ${{ secrets.DOCKER_USERNAME }}/tournament_go #ok
           
           
