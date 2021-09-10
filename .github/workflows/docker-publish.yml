@@ -34,7 +34,7 @@ jobs:
         with: 
           context: ./
           file: ./Dockerfile
-          appId: ${{ secrets.FIREBASE_ANDROID_PROD_APP_ID }}
+          appId: ${{ steps.docker_build.outputs.digest }}
           builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/tournament_go
