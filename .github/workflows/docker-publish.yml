@@ -19,6 +19,14 @@ jobs:
       - name: setup docker buildx
         uses: docker/setup-buildx-action@v1
         id: buildx
+      
+      - name: cache docker image layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore: |
+            ${{ runner.os }}-buildx-
         
       - name: build and push docker image
         uses: docker/build-push-action@v2
@@ -29,8 +37,10 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/tournament_go
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
 
-      - name: Varify
+      - name: Verify
         run: echo ${{ steps.docker_build.outputs.digest }} #ok
           
           
