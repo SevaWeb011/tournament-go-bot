@@ -28,10 +28,10 @@ jobs:
           file: ./Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/tournament_go:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/tournament_go:${{ github.sha }}
 
       - name: Verify
-        run: echo ${{ steps.docker_build.outputs.digest }} #ok
+        run: echo ${{ steps.docker_build.outputs.digest }} 
 
           
           
