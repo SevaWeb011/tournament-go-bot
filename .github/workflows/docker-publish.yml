@@ -31,6 +31,6 @@ jobs:
           tags: ${{ secrets.DOCKER_USERNAME }}/tournament_go
 
       - name: Varify
-        run: echo ${{ steps.docker_build.outputs.digest }}
+        run: echo ${{ steps.docker_build.outputs.digest }} #ok
           
           
