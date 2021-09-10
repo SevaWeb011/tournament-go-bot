@@ -34,7 +34,7 @@ jobs:
         with: 
           context: ./
           file: ./Dockerfile
-          appId: ${{ steps.docker_build.outputs.digest }}
+          appId: ${{ github.sha }}
           builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/tournament_go
