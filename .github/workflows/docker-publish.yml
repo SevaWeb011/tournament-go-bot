@@ -41,6 +41,6 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache
 
       - name: Verify
-        run: echo ${{ steps.docker_build.outputs.digest }} #ok
+        run: echo ${{ steps.docker_build.outputs.digest }} 
           
           
