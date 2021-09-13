@@ -5,6 +5,11 @@
   
   pre_tasks:
 
+  - name: debug
+    ansible.builtin.debug:
+      msg:
+        - "SHOW {{ loginroot }} and {{ passroot }}"
+
   - name: install 
     apt: 
       name: 
@@ -26,7 +31,7 @@
 
   - name: pull an image
     docker_image:
-      name: foilv/tournaments_go
+      name: foilv/tournament_go
       source: pull
 
   - name: make dirs 0777   
@@ -34,8 +39,8 @@
 
   - name: create database 
     community.mysql.mysql_db:
-      login_user: root
-      login_password: root
+      login_user:  "{{ loginroot }}"
+      login_password: "{{ passroot }}"
       name: tournament_go
       state: present
 
@@ -52,8 +57,8 @@
 
   - name: Create database user 
     community.mysql.mysql_user:
-      name: foilv
-      password: 12345
+      name: "{{ newuser }}"
+      password: "{{ newuserpass }}"
       priv: '*.*:ALL,GRANT'
       host: '%'
       state: present
@@ -61,14 +66,14 @@
   - name: start a container
     community.docker.docker_container:
       name: myapplication
-      image: foilv/tournaments_go
+      image: foilv/tournament_go
       state: started
       env: 
         HOST: "192.168.3.223" 
-        DATABASE: "tournament_go"
-        USER: "foilv"
-        PASSWORD: "12345"
-        BOT: ""
+        DATABASE: "{{ database }}"
+        USER: "{{ newuser }}"
+        PASSWORD: "{{ newuserpass }}"
+        BOT: "{{ bot }}"
 
   roles:
     - geerlingguy.docker

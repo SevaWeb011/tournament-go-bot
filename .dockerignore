@@ -6,3 +6,4 @@ playbook.yml
 secrets.yml
 .vagrant
 Vagrantfile
+secret.json
