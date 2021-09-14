@@ -6,7 +6,7 @@ RUN mkdir /app
 
 COPY . /app
 
-WORKDIR /app
+WORKDIR /app/BOT
 
 ENTRYPOINT ["python"]
 
