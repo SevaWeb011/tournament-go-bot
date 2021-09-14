@@ -4,7 +4,7 @@ RUN pip3 install python-telegram-bot pythonping pyyaml BeautifulSoup4 pytelegram
 
 RUN mkdir /app
 
-COPY . /app/BOT
+COPY ./BOT /app
 
 WORKDIR /app
 
