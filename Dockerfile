@@ -4,9 +4,9 @@ RUN pip3 install python-telegram-bot pythonping pyyaml BeautifulSoup4 pytelegram
 
 RUN mkdir /app
 
-COPY . /app
+COPY . /app/BOT
 
-WORKDIR /app/BOT
+WORKDIR /app
 
 ENTRYPOINT ["python"]
 
