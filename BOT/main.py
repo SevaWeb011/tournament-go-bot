@@ -243,6 +243,28 @@ def get_saturday(): #эта функция получает дату суббо�
 
     return saturday
 
+def get_sunday(): #эта функция получает дату воскресенья текущей недели 
+    num_date = datetime.now().date().weekday()
+    today = datetime.now().date()
+    sunday = ""
+
+    if num_date == 0:
+        sunday = today + timedelta(days=6)
+    if num_date == 1:
+        sunday = today + timedelta(days=5)
+    if num_date == 2:
+        sunday = today + timedelta(days=4)    
+    if num_date == 3:
+        sunday = today + timedelta(days=3)
+    if num_date == 4:
+        sunday = today + timedelta(days=2)
+    if num_date == 5:
+        sunday = today + timedelta(days=1)
+    if num_date == 6:
+        sunday = today + timedelta(days=0)
+
+    return sunday
+
 def check_exist_user(chatID): #проверка записи пользователя, чтобы не записывался один пользователь несколько раз
 
     query = "SELECT * FROM `user_BotGo` WHERE id_User='" + str(chatID) + "';"
@@ -570,11 +592,7 @@ def remove_city_for_user(userID):
 
 # if __name__ == '__main__':
     
-#         download_page("https://gofederation.ru/tournaments/", "current.html")
-#         compare("current.html", "old.html")
-#         copy_current_to_old("old.html", "current.html")
-#         main()
-#         delete_old_tournaments()
+#         get_sunday()
 
 
          
