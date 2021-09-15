@@ -202,15 +202,13 @@ def weekend_tournaments(): #выполняет запрос на вывод по
         result = cursor.fetchall()
 
         for item in result:
-            if item[0] == get_saturday():
+            if item[0] == get_saturday() or item[0] == get_sunday():
                 tournament += "Начало: " + str(item[0]) + "\n"
                 tournament += "Конец: " + str(item[1]) + "\n"
                 tournament += "Название: " + item[2] + "\n"
                 tournament += "Город: " + item[3] + "\n"
                 tournament += "Подробнее: " + item[4] + "\n\n"
-                if item[0] != get_saturday():
-                    tournament += "На ближайших выходных турниров нет :("
-
+               
         conn.commit()
 
     except Error as e:
