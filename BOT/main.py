@@ -72,7 +72,7 @@ def main(): #связывает 2 функции insert_tournament и getText
     tournaments = getText()
     insert_tournament(tournaments)
 
-def getText(): #получает текст для вставки новях турниров в базу данных
+def getText(): #получает текст для вставки новых турниров в базу данных
     html = open('difference.html')
     root = BeautifulSoup(html, 'lxml')
     tr = root.select('tr')

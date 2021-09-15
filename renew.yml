@@ -1,0 +1,15 @@
+---
+- hosts: all
+  become: true
+
+  tasks:
+
+  - community.docker.docker_container:
+      name: bot
+      image: "{{ docker_image }}"
+      env: 
+        HOST: "192.168.3.223" 
+        DATABASE: "{{ database }}"
+        USER: "{{ newuser }}"
+        PASSWORD: "{{ newuserpass }}"
+        BOT: "{{ bot }}"
