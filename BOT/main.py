@@ -91,18 +91,20 @@ def getText(): #получает текст для вставки новых т�
                 text_date = i.text.replace("\xa0-\xa0", "")
                 format_string = "%d.%m.%Y"
                 t_start = datetime.strptime(text_date, format_string).strftime("%Y-%m-%d")
-                tour.setStart(t_start)
+                if t_start >= date():
+                    tour.setStart(t_start)
                 continue
 
             if "padding-left" in str(i):
                 text_date = i.text
                 format_string = "%d.%m.%Y"
                 t_end = datetime.strptime(text_date, format_string).strftime("%Y-%m-%d")
-                tour.setEnd(t_end)
+                if t_end >= date():
+                    tour.setEnd(t_end)
                 continue
 
             if "tournament" in str(i):
-                t_name = i.text
+                t_name = i.text.replace(" (", ", ").replace(")", "")
                 tour.setName(t_name)
                 continue
 
@@ -146,9 +148,9 @@ def all_tournaments(): #выполняет запрос на вывод поль
         result = cursor.fetchall()
         for item in result:
             tournament = "Начало: " + str(item[0]) + "\n"
-            tournament += "Конец: " + str(item[1]) + "\n"
-            tournament += "Название: " + item[2] + "\n"
-            tournament += "Город: " + item[3] + "\n"
+            tournament += "Конец: " + str(item[1]) + "\n\n"
+            tournament += "Название: " + item[2] + "\n\n"
+            tournament += "Город: " + item[3] + "\n\n"
             tournament += "Подробнее: " + item[4] + "\n"
             all_tournaments.append(tournament)
             
@@ -176,9 +178,9 @@ def all_tournaments_in_city(chatID): #выполняет запрос на вы�
         for res in result:
             if res[3] in city_user:
                 tournament = "Начало: " + str(res[0]) + "\n"
-                tournament += "Конец: " + str(res[1]) + "\n"
-                tournament += "Название: " + res[2] + "\n"
-                tournament += "Город: " + res[3] + "\n"
+                tournament += "Конец: " + str(res[1]) + "\n\n"
+                tournament += "Название: " + res[2] + "\n\n"
+                tournament += "Город: " + res[3] + "\n\n"
                 tournament += "Подробнее: " + res[4] + "\n"
                 all_tournaments.append(tournament)
 
@@ -204,9 +206,9 @@ def weekend_tournaments(): #выполняет запрос на вывод по
         for item in result:
             if item[0] == get_saturday() or item[0] == get_sunday():
                 tournament += "Начало: " + str(item[0]) + "\n"
-                tournament += "Конец: " + str(item[1]) + "\n"
-                tournament += "Название: " + item[2] + "\n"
-                tournament += "Город: " + item[3] + "\n"
+                tournament += "Конец: " + str(item[1]) + "\n\n"
+                tournament += "Название: " + item[2] + "\n\n"
+                tournament += "Город: " + item[3] + "\n\n"
                 tournament += "Подробнее: " + item[4] + "\n\n"
                
         conn.commit()
@@ -494,9 +496,9 @@ def all_tournaments_in_city_NEW(chatID): #выполняет запрос на �
         for res in result:
             if res[4] in city_user:
                 tournament = "Начало: " + str(res[1]) + "\n"
-                tournament += "Конец: " + str(res[2]) + "\n"
-                tournament += "Название: " + res[3] + "\n"
-                tournament += "Город: " + res[4] + "\n"
+                tournament += "Конец: " + str(res[2]) + "\n\n"
+                tournament += "Название: " + res[3] + "\n\n"
+                tournament += "Город: " + res[4] + "\n\n"
                 tournament += "Подробнее: " + res[5] + "\n"
                 all_tournaments.append([res[0], tournament])
 

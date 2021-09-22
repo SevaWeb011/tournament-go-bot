@@ -6,7 +6,6 @@ import telebot
 from telebot import types
 import main
 
-
 token = os.getenv("BOT")
 bot = telebot.TeleBot(token)
 state = "city_selection"
@@ -57,6 +56,7 @@ def message(message):
         if message.html_text == 'стоп':
             main.query_change_state("main", message.chat.id)
             bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name, reply_markup=types.ReplyKeyboardRemove())
+            listCity.clear()
        
 
     if SelectState == "main":
@@ -93,17 +93,27 @@ def message(message):
             main.remove_city_for_user(message.chat.id)
             main.query_change_state("city_selection", message.chat.id)
             SelectState = main.selectState(message.chat.id)
-            bot.send_message(message.chat.id, 'Я очистил твои города, выбирай новые', reply_markup=towns)
+            bot.send_message(message.chat.id, 'Я очистил твои города, выбирай новые. Если клавиатура не появилась нажми команду /start', reply_markup=towns)
             return
 
         else: 
             bot.send_message(message.chat.id, 'Я тебя не понимаю, напиши что-нибудь другое :(')
         
     if SelectState == "message_to_developer" and message.text.lower() != "/message_to_developer":
-        bot.send_message(925936432, "Сообщение от " + message.chat.first_name + " " +  message.chat.username + "\n" + message.html_text)
+
+        keyboard = telebot.types.InlineKeyboardMarkup().add(telebot.types.InlineKeyboardButton("Ответить", callback_data=message.chat.id))
+
+        bot.send_message(925936432, "Сообщение от: " + "\n" + str(message.chat.id) + "\n" + str(message.html_text), reply_markup=keyboard)
+
         bot.send_message(message.chat.id, "Отправил")
         main.query_change_state("main", message.chat.id)
         bot.send_message(message.chat.id, 'Если хочешь еще раз написать разработчику, напиши команду /message_to_developer')
+
+@bot.callback_query_handler(func=lambda call: True)
+def callback_query(call):
+    print(call)
+
+
 
 def push_message():
     # если выборка city из таблицы NEW_tournament_go 
@@ -133,7 +143,7 @@ def background():#test 9
         main.main(),  # добавление новых турниров в основную таблицу
         main.delete_old_tournaments()  # удаление устаревших по дате турниров из основной таблицы
 
-        time.sleep(60)
+        time.sleep(10)
     
 
 if __name__ == '__main__':
