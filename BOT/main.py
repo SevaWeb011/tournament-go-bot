@@ -117,7 +117,7 @@ def getText(): #получает текст для вставки новых т�
         if tour.name != "":
             tournaments.append(tour)
 
-    return tournaments
+    return tournaments #t
 
 def delete_old_tournaments(): #удаляет старые турниры, у которых дата старта меньше тукущей даты
     try:
