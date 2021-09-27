@@ -96,10 +96,6 @@ def message(message):
             bot.send_message(message.chat.id, 'Я очистил твои города, выбирай новые. Если клавиатура не появилась нажми команду /start', reply_markup=towns)
             return
 
-        if message.text.lower() == "паша":
-            bot.send_message(46604087, 'Павел')
-            return
-
         else: 
             bot.send_message(message.chat.id, 'Я тебя не понимаю, напиши что-нибудь другое :(')
         
