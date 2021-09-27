@@ -91,16 +91,14 @@ def getText(): #получает текст для вставки новых т�
                 text_date = i.text.replace("\xa0-\xa0", "")
                 format_string = "%d.%m.%Y"
                 t_start = datetime.strptime(text_date, format_string).strftime("%Y-%m-%d")
-                if t_start >= date():
-                    tour.setStart(t_start)
+                tour.setStart(t_start)
                 continue
 
             if "padding-left" in str(i):
                 text_date = i.text
                 format_string = "%d.%m.%Y"
                 t_end = datetime.strptime(text_date, format_string).strftime("%Y-%m-%d")
-                if t_end >= date():
-                    tour.setEnd(t_end)
+                tour.setEnd(t_end)
                 continue
 
             if "tournament" in str(i):

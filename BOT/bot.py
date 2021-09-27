@@ -96,22 +96,26 @@ def message(message):
             bot.send_message(message.chat.id, 'Я очистил твои города, выбирай новые. Если клавиатура не появилась нажми команду /start', reply_markup=towns)
             return
 
+        if message.text.lower() == "паша":
+            bot.send_message(46604087, 'Павел')
+            return
+
         else: 
             bot.send_message(message.chat.id, 'Я тебя не понимаю, напиши что-нибудь другое :(')
         
     if SelectState == "message_to_developer" and message.text.lower() != "/message_to_developer":
 
-        keyboard = telebot.types.InlineKeyboardMarkup().add(telebot.types.InlineKeyboardButton("Ответить", callback_data=message.chat.id))
+        # keyboard = telebot.types.InlineKeyboardMarkup().add(telebot.types.InlineKeyboardButton("Ответить", callback_data=message.chat.id))
 
-        bot.send_message(925936432, "Сообщение от: " + "\n" + str(message.chat.id) + "\n" + str(message.html_text), reply_markup=keyboard)
+        bot.send_message(925936432, "Сообщение от: " + "\n" + str(message.chat.id) + "\n" + str(message.html_text))
 
         bot.send_message(message.chat.id, "Отправил")
         main.query_change_state("main", message.chat.id)
         bot.send_message(message.chat.id, 'Если хочешь еще раз написать разработчику, напиши команду /message_to_developer')
 
-@bot.callback_query_handler(func=lambda call: True)
-def callback_query(call):
-    print(call)
+# @bot.callback_query_handler(func=lambda call: True)
+# def callback_query(call):
+#     print(call)
 
 
 
@@ -121,15 +125,20 @@ def push_message():
 # то выполнить запрос к таблице UserCity 
 # (выбрать id_user где city = city из таблицы NEW_tournament_go) 
 # отправить этому id сообщение о турнире
-    for city in main.all_cities_from_new_tournaments():
-        if city in main.user_cities():
-            for user in main.id_user_where_city_in_NEW():
-                all_tournaments = main.all_tournaments_in_city_NEW(user[0])
-                for tournament in all_tournaments:
-                    result = main.Select_message_was_send(user[0], tournament[0])
-                    if len(result) == 0:
-                        bot.send_message(user[0], "В твоем городе появился турнир \n" + tournament[1])
-                        main.message_was_send(user[0], tournament[0])
+    try:
+        for city in main.all_cities_from_new_tournaments():
+            if city in main.user_cities():
+                for user in main.id_user_where_city_in_NEW():
+                    all_tournaments = main.all_tournaments_in_city_NEW(user[0])
+                    for tournament in all_tournaments:
+                        result = main.Select_message_was_send(user[0], tournament[0])
+                        if len(result) == 0:
+                            bot.send_message(user[0], "В твоем городе появился турнир \n" + tournament[1])
+                            main.message_was_send(user[0], tournament[0])
+    except Exception as e:
+            print(e) # do not handle error #403
+    except AssertionError:
+            print( "!!!!!!! user has been blocked !!!!!!!" ) # do not handle error #403
 
 def background():#test 9
     while True:
@@ -151,4 +160,4 @@ if __name__ == '__main__':
     t1 = Thread(target=background, args=())
     t1.start()
     
-    bot.polling()
+    bot.polling(none_stop=True)
