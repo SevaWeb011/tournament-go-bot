@@ -14,10 +14,17 @@
 
   tasks:
 
+  - name: pull an image
+    docker_image:
+      name: foilv/tournament_go
+      tag: bot
+      source: 'pull'
+      debug: true
+
   - name: start a container
     community.docker.docker_container:
-      name: myapp
-      image: foilv/tournament_go:latest
+      name: Bot
+      image: foilv/tournament_go:bot
       state: started
       env: 
         HOST: "172.17.0.2" 
