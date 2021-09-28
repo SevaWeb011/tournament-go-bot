@@ -1,31 +1,16 @@
 ---
 - name: tournament_go
-  hosts: all
+  hosts: bot
+  become_method: sudo
   become: yes
-  
-  pre_tasks:
+  become_user: root
 
-  - name: debug
-    ansible.builtin.debug:
-      msg:
-        - "SHOW {{ loginroot }} and {{ passroot }}"
-
-  - name: install 
-    apt: 
-      name: 
-        - sudo 
-        - python3-pip
-        - python3-jmespath
-        - ca-certificates
-        - curl
-        - gnupg2
-        - lsb-release
-        - python-pip
-        - python-setuptools
-        - docker
-        - python-requests
-        - python-docker
-      update_cache: yes
+  vars:
+    ansible_user: "{{ newuser }}"
+    ansible_ssh_private_key: "{{ key }}"
+    ansible_port: 22
+    ansible_connection: ssh
+    ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
 
   tasks:
 
@@ -34,47 +19,15 @@
       name: foilv/tournament_go
       source: pull
 
-  - name: make dirs 0777   
-    command: sudo chmod 777 /var/run/docker.sock
-
-  - name: create database 
-    community.mysql.mysql_db:
-      login_user:  "{{ loginroot }}"
-      login_password: "{{ passroot }}"
-      name: tournament_go
-      state: present
-
-  - name: Copy database dump file
-    copy:
-      src: tournament_go.sql
-      dest: /tmp
-
-  - name: Restore database ignoring errors
-    community.mysql.mysql_db:
-      name: tournament_go
-      state: import
-      target: /tmp/tournament_go.sql
-
-  - name: Create database user 
-    community.mysql.mysql_user:
-      name: "{{ newuser }}"
-      password: "{{ newuserpass }}"
-      priv: '*.*:ALL,GRANT'
-      host: '%'
-      state: present
-
   - name: start a container
     community.docker.docker_container:
-      name: myapplication
+      name: myapp
       image: foilv/tournament_go
       state: started
       env: 
-        HOST: "192.168.3.223" 
-        DATABASE: "{{ database }}"
-        USER: "{{ newuser }}"
-        PASSWORD: "{{ newuserpass }}"
+        #HOST: "192.168.3.223" 
+        DATABASE: "tournament_go"
+        USER: "{{ loginroot }}"
+        #PASSWORD: "{{ newuserpass }}"
         BOT: "{{ bot }}"
 
-  roles:
-    - geerlingguy.docker
-    - geerlingguy.mysql

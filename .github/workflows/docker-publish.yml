@@ -16,22 +16,33 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
-      - name: setup docker buildx
-        uses: docker/setup-buildx-action@v1
-        id: buildx
-        
-      - name: build and push docker image
-        uses: docker/build-push-action@v2
-        id: docker_build
-        with: 
-          context: ./
-          file: ./Dockerfile
-          builder: ${{ steps.buildx.outputs.name }}
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/tournament_go:${{ github.sha }}
+      - name: sed 
+        run: cat secret1.json | sed -i -e 's|BOT|'${{ secrets.BOT }}'|g' secret.json -i -e 's|LOGIN_ROOT|'${{ secrets.LOGIN_ROOT }}'|g' secret.json -i -e 's|PASS_ROOT|'${{ secrets.PASS_ROOT }}'|g' 
 
-      - name: Verify
-        run: echo ${{ steps.docker_build.outputs.digest }} 
+      - name: install authorized key id_rsa.pub
+        env:
+          DEPLOY_SERVER_KEY: ${{ secrets.DEPLOY_SERVER_KEY }}
+        run: echo $DEPLOY_SERVER_KEY | base64 --decode > key | chmod 0600 key
+
+      - name: run playbook
+        run: ansible-playbook -i inventory.yml playbook.yml --extra-vars "@secret1.json"
+
+      # - name: setup docker buildx
+      #   uses: docker/setup-buildx-action@v1
+      #   id: buildx
+        
+      # - name: build and push docker image
+      #   uses: docker/build-push-action@v2
+      #   id: docker_build
+      #   with: 
+      #     context: ./
+      #     file: ./Dockerfile
+      #     builder: ${{ steps.buildx.outputs.name }}
+      #     push: true
+      #     tags: ${{ secrets.DOCKER_USERNAME }}/tournament_go:${{ github.sha }}
+
+      # - name: Verify
+      #   run: echo ${{ steps.docker_build.outputs.digest }} 
 
           
           

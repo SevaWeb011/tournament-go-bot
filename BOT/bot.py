@@ -135,6 +135,11 @@ def push_message():
             print(e) # do not handle error #403
     except AssertionError:
             print( "!!!!!!! user has been blocked !!!!!!!" ) # do not handle error #403
+def backup():
+    try:
+        os.system("mysqldump -u root tournament_go > /tmp/tournament_go.sql")
+    except Exception as e:
+        print(e) 
 
 def background():#test 9
     while True:
@@ -146,7 +151,8 @@ def background():#test 9
         main.delete_all_from_NEW(),  # удаление турниров из новых
         main.del_message_was_send(),  # очистка отправленных сообщений
         main.main(),  # добавление новых турниров в основную таблицу
-        main.delete_old_tournaments()  # удаление устаревших по дате турниров из основной таблицы
+        main.delete_old_tournaments(),  # удаление устаревших по дате турниров из основной таблицы
+        backup() #бэкап бд
 
         time.sleep(10)
     
