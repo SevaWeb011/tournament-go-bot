@@ -14,6 +14,12 @@
 
   tasks:
 
+    - name: run mysql
+      run: systemctl start mysqld
+
+    - name: run docker 
+      run: systemctl start docker
+
   - name: start a container
     community.docker.docker_container:
       name: myapp
