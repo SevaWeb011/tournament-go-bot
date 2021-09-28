@@ -14,12 +14,12 @@
 
   tasks:
 
-  - name: pull an image
-    docker_image:
-      name: foilv/tournament_go
-      tag: bot
-      source: 'pull'
-      debug: true
+  # - name: pull an image
+  #   docker_image:
+  #     name: foilv/tournament_go
+  #     tag: bot
+  #     source: 'pull'
+  #     debug: true
 
   - name: start a container
     community.docker.docker_container:
