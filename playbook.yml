@@ -6,7 +6,7 @@
   become_user: root
 
   vars:
-    ansible_user: "{{ newuser }}"
+    ansible_user: foilv
     ansible_ssh_private_key: "{{ key }}"
     ansible_port: 22
     ansible_connection: ssh
@@ -25,7 +25,7 @@
       image: foilv/tournament_go
       state: started
       env: 
-        #HOST: "192.168.3.223" 
+        HOST: "194.32.248.108" 
         DATABASE: "tournament_go"
         USER: "{{ loginroot }}"
         #PASSWORD: "{{ newuserpass }}"
