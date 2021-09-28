@@ -17,7 +17,8 @@
   - name: start a container
     community.docker.docker_container:
       name: myapp
-      image: foilv/tournament_go
+      image: foilv/tournament_go:91d77ffd68d97b29f5235f67f81892d719697803
+
       state: started
       env: 
         HOST: "194.32.248.108" 
