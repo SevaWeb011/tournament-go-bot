@@ -20,7 +20,7 @@
       image: foilv/tournament_go:91d77ffd68d97b29f5235f67f81892d719697803
       state: started
       env: 
-        #HOST: "194.32.248.108" 
+        HOST: "172.17.0.2" 
         DATABASE: "tournament_go"
         USER: "{{ loginroot }}"
         PASSWORD: "{{ passroot }}"
