@@ -25,6 +25,8 @@ jobs:
         run: echo $DEPLOY_SERVER_KEY | base64 --decode > key | chmod 0600 key
 
       - name: run playbook
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: False
         run: ansible-playbook -i inventory.yml playbook.yml -u foilv --extra-vars "@secret1.json"
 
       # - name: setup docker buildx

@@ -14,11 +14,6 @@
 
   tasks:
 
-  - name: pull an image
-    docker_image:
-      name: foilv/tournament_go
-      source: pull
-
   - name: start a container
     community.docker.docker_container:
       name: myapp
