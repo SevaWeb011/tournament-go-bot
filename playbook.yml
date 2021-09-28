@@ -24,6 +24,6 @@
         HOST: "194.32.248.108" 
         DATABASE: "tournament_go"
         USER: "{{ loginroot }}"
-        #PASSWORD: "{{ newuserpass }}"
+        PASSWORD: "{{ passroot }}"
         BOT: "{{ bot }}"
 
