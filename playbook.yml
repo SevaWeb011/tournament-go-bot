@@ -6,7 +6,7 @@
   become_user: root
 
   vars:
-    ansible_user: foilv
+    ansible_user: root
     ansible_ssh_private_key: "{{ key }}"
     ansible_port: 22
     ansible_connection: ssh
