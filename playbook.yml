@@ -27,7 +27,7 @@
       image: foilv/tournaments_go
       tag: bot
       state: started
-      environment: 
+      env: 
         HOST: "172.17.0.2" 
         DATABASE: "tournament_go"
         USER: "{{ loginroot }}"
