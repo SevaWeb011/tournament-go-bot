@@ -4,5 +4,5 @@ all:
       ansible_host: 194.32.248.108
       ansible_port: 22
       ansible_user: foilv
-      #ansible_become_password: "{{ PASSWORD }}"
+      ansible_become_password: "{{ passs }}"
       ansible_ssh_private_key_file: ./key
