@@ -20,6 +20,15 @@
   #     source: pull
   #     debug: true
 
+  - name: Create database user 
+    community.mysql.mysql_user:
+      name: "foilv"
+      password: "{{ PASSWORD }}"
+      login_unix_socket: /var/run/mysqld/mysqld.sock
+      priv: '*.*:ALL,GRANT'
+      host: '%'
+      state: present
+
   - name: start a container
     community.docker.docker_container:
       name: Bot
