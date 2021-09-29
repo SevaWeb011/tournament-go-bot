@@ -18,7 +18,7 @@
     docker_image:
       name: foilv/tournament_go
       tag: bot
-      source: 'pull'
+      # source: 'pull'
       debug: true
 
   - name: start a container
