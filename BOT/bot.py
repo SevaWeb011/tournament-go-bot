@@ -152,7 +152,7 @@ def background():#test 9
         main.del_message_was_send(),  # очистка отправленных сообщений
         main.main(),  # добавление новых турниров в основную таблицу
         main.delete_old_tournaments(),  # удаление устаревших по дате турниров из основной таблицы
-        backup() #бэкап бд
+        #backup() #бэкап бд
 
         time.sleep(10)
     
