@@ -34,8 +34,8 @@
       name: Bot
       image: foilv/tournaments_go:bot4
       state: started
-      # env: 
-      #   PASSWORD: "{{ PASSWORD }}"
+      env: 
+        PASSWORD: "{{ PASSWORD }}"
       #   HOST: "194.32.248.108" 
       #   DATABASE: "tournament_go"
       #   USER: "foilv"
