@@ -34,7 +34,7 @@
       name: Bot
       # image: foilv/tournaments_go:bot7
       # state: started
-      command: sudo docker run -d -t -i -e HOST=194.32.248.108 -e DATABASE=tournament_go -e USER=foilv -e PASSWORD={{ PASSWORD }} -e BOT={{ BOT }} foilv/tournaments_go:bot7
+      command: sudo docker run -d -t -i -e HOST='194.32.248.108' -e DATABASE='tournament_go' -e USER='foilv' -e PASSWORD="{{ PASSWORD }}" -e BOT="{{ BOT }}" foilv/tournaments_go:bot8
       # PASSWORD: "{{ PASSWORD }}"
       # HOST: "194.32.248.108" 
       # DATABASE: "tournament_go"
