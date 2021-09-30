@@ -36,7 +36,7 @@
       state: started
       env: 
         PASSWORD: "{{ PASSWORD }}"
-        HOST: "194.32.248.108:3306" 
+        HOST: "194.32.248.108" 
         DATABASE: "tournament_go"
         USER: "foilv"
         BOT: "{{ bot }}"
