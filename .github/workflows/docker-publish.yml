@@ -13,9 +13,6 @@ jobs:
       - name: sed 
         run: cat secret1.json | sed -i -e 's|ROOT|'${{ secrets.ROOT }}'|g' secret1.json -i -e 's|BOT1|'${{ secrets.BOT }}'|g' secret1.json -i -e 's|LOGFOIL|'${{ secrets.LOGIN_ROOT }}'|g' secret1.json -i -e 's|FPASSW|'${{ secrets.PASS_ROOT }}'|g' secret1.json -i -e 's|DEPLOY_SERVER_KEY|'${{ secrets.DEPLOY_SERVER_KEY }}'|g' secret1.json
 
-      - name: debug
-        run: cat secret1.json | base64
-
       - name: install authorized key id_rsa.pub
         env:
           DEPLOY_SERVER_KEY: ${{ secrets.DEPLOY_SERVER_KEY }}
