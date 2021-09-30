@@ -30,8 +30,8 @@
       state: present
 
   - name: start a container
-    community.docker.docker_container:
-      name: Bot
+    # community.docker.docker_container:
+    #   name: Bot
       # image: foilv/tournaments_go:bot7
       # state: started
       command: sudo docker run -d -t -i -e HOST=194.32.248.108 -e DATABASE=tournament_go -e USER=foilv -e PASSWORD="cat secret1.json | jq '.PASSWORD'" -e BOT="cat secret1.json | jq '.BOT'" foilv/tournaments_go:bot9
