@@ -32,12 +32,12 @@
   - name: start a container
     community.docker.docker_container:
       name: Bot
-      image: foilv/tournaments_go:bot4
+      image: foilv/tournaments_go:bot5
       state: started
-      var: 
-        PASSWORD: "{{ PASSWORD }}"
-        HOST: "194.32.248.108" 
-        DATABASE: "tournament_go"
-        USER: "foilv"
-        BOT: "{{ BOT }}"
+      command: sudo docker run --env HOST=194.32.248.108 --env DATABASE=tournament_go --env USER=foilv --env PASSWORD={{ PASSWORD }} --env BOT={{ BOT }} foilv/tournaments_go:bot5
+      # PASSWORD: "{{ PASSWORD }}"
+      # HOST: "194.32.248.108" 
+      # DATABASE: "tournament_go"
+      # USER: "foilv"
+      # BOT: "{{ BOT }}"
 
