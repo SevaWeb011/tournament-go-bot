@@ -1,6 +1,10 @@
 FROM python:3.8.2-slim-buster
 
-ENV HOST DATABASE USER PASSWORD BOT
+ARG HOST 
+ARG DATABASE 
+ARG USER 
+ARG PASSWORD 
+ARG BOT
 
 RUN pip3 install python-telegram-bot pythonping pyyaml BeautifulSoup4 pytelegrambotapi mysql-connector-python lxml
 
