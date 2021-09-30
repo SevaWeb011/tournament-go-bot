@@ -32,7 +32,7 @@
   - name: start a container
     community.docker.docker_container:
       name: Bot
-      image: foilv/tournaments_go:bot4
+      image: "tournaments_go:bot4"
       state: started
       env: 
         PASSWORD: "{{ PASSWORD }}"
