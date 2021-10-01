@@ -29,11 +29,11 @@
       image: foilv/tournaments_go:bot9
       state: started
       env:
-        HOST: '194.32.248.108'
-        DATABASE: 'tournament_go'
-        USER: 'foilv'
-        PASSWORD:
-        BOT: 
+        HOST: "194.32.248.108"
+        DATABASE: "tournament_go"
+        USER: "foilv"
+        PASSWORD: "cat secret1.json | jq '.PASSWORD'"
+        BOT: "cat secret1.json | jq '.BOT'"
       # env: 
       #   HOST: 194.32.248.108
       #   DATABASE: tournament_go

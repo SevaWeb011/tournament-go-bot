@@ -23,14 +23,4 @@ jobs:
           ANSIBLE_HOST_KEY_CHECKING: False
         run: ansible-playbook -i inventory.yml playbook.yml --extra-vars "@secret1.json"
 
-      # - name: run docker
-      #   run: docker run foilv/tournaments_go:bot9
-      #   env: 
-      #     HOST: 194.32.248.108
-      #     DATABASE: tournament_go
-      #     USER: foilv
-      #     PASSWORD: ${{ secrets.PASS_ROOT }}
-      #     BOT: ${{ secrets.BOT }}
-
-          
           
