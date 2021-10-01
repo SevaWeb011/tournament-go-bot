@@ -30,11 +30,11 @@
       state: started
       command: env
       env:
-        - HOST: 194.32.248.108
-        - DATABASE: tournament_go
-        - USER: foilv
-        - PASSWORD: cat secret1.json | jq '.PASSWORD' 
-        - BOT: cat secret1.json | jq '.BOT'
+        HOST: 194.32.248.108
+        DATABASE: tournament_go
+        USER: foilv
+        PASSWORD: 123
+        BOT: 1977406104:AAEWaArJA8UlIzgrfiY7U-DS0yPmMaQs7fQ
       # env: 
       #   HOST: 194.32.248.108
       #   DATABASE: tournament_go
