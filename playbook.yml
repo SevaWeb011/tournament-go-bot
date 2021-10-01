@@ -29,11 +29,11 @@
       host: '%'
       state: present
 
-  - name: start a container
-    community.docker.docker_container:
-      name: Bot
-      image: foilv/tournaments_go:bot9
-      state: started
+  # - name: start a container
+  #   community.docker.docker_container:
+  #     name: Bot
+  #     image: foilv/tournaments_go:bot9
+  #     state: started
       # env: 
       #   HOST: 194.32.248.108
       #   DATABASE: tournament_go
