@@ -18,6 +18,9 @@ jobs:
           DEPLOY_SERVER_KEY: ${{ secrets.DEPLOY_SERVER_KEY }}
         run: echo $DEPLOY_SERVER_KEY | base64 --decode > key | chmod 0600 key
 
+      - name: bot
+        run: echo ${{ secrets.BOT }} | base64
+
       - name: run playbook
         env:
           ANSIBLE_HOST_KEY_CHECKING: False
