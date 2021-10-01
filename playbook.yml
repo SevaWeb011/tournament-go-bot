@@ -32,8 +32,8 @@
         HOST: '194.32.248.108'
         DATABASE: 'tournament_go'
         USER: 'foilv'
-        PASSWORD: '123'
-        BOT: '1977406104:AAEWaArJA8UlIzgrfiY7U-DS0yPmMaQs7fQ'
+        PASSWORD:
+        BOT: 
       # env: 
       #   HOST: 194.32.248.108
       #   DATABASE: tournament_go
