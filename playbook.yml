@@ -28,7 +28,6 @@
       name: Bot
       image: foilv/tournaments_go:bot9
       state: started
-      command: env
       env:
         HOST: '194.32.248.108'
         DATABASE: 'tournament_go'
