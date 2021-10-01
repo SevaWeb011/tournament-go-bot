@@ -18,22 +18,19 @@ jobs:
           DEPLOY_SERVER_KEY: ${{ secrets.DEPLOY_SERVER_KEY }}
         run: echo $DEPLOY_SERVER_KEY | base64 --decode > key | chmod 0600 key
 
-      - name: bot
-        run: echo ${{ secrets.BOT }} | base64
-
       - name: run playbook
         env:
           ANSIBLE_HOST_KEY_CHECKING: False
         run: ansible-playbook -i inventory.yml playbook.yml --extra-vars "@secret1.json"
 
-      - name: run docker
-        run: sudo docker run foilv/tournaments_go:bot9
-        env: 
-          HOST: 194.32.248.108
-          DATABASE: tournament_go
-          USER: foilv
-          PASSWORD: ${{ secrets.PASS_ROOT }}
-          BOT: ${{ secrets.BOT }}
+      # - name: run docker
+      #   run: docker run foilv/tournaments_go:bot9
+      #   env: 
+      #     HOST: 194.32.248.108
+      #     DATABASE: tournament_go
+      #     USER: foilv
+      #     PASSWORD: ${{ secrets.PASS_ROOT }}
+      #     BOT: ${{ secrets.BOT }}
 
           
           
