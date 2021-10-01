@@ -29,9 +29,8 @@ jobs:
           HOST: 194.32.248.108
           DATABASE: tournament_go
           USER: foilv
-          PASSWORD: $(cat secret1.json | jq '.PASSWORD')
-          BOT: $(cat secret1.json | jq '.BOT')
-
+          PASSWORD: ${{ secrets.PASS_ROOT }}
+          BOT: ${{ secrets.BOT }}
 
           
           
