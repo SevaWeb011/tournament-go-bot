@@ -24,7 +24,9 @@ jobs:
         run: ansible-playbook -i inventory.yml playbook.yml --extra-vars "@secret1.json"
 
       - name: run docker
-        run: sudo docker run -d -t -i -e HOST=194.32.248.108 -e DATABASE=tournament_go -e USER=foilv -e PASSWORD=$(cat secret1.json | jq '.PASSWORD') -e BOT=$(cat secret1.json | jq '.BOT') foilv/tournaments_go:bot9
+        run: sudo docker run -e HOST=194.32.248.108 -e DATABASE=tournament_go -e USER=foilv -e PASSWORD=$(cat secret1.json | jq '.PASSWORD') -e BOT=$(cat secret1.json | jq '.BOT') foilv/tournaments_go:bot9
 
+      - name: file 
+        run: cat secret1.json
           
           
