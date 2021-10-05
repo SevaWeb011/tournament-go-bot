@@ -80,7 +80,7 @@ def message(message):
         
         if message.text.lower() == "/tournaments_in_my_city":
            for tournament in main.all_tournaments_in_city(message.chat.id):
-                bot.send_message(message.chat.id, '🏆 \n' + tournament)
+                bot.send_message(message.chat.id, 'Турнир в твоем городе 🏆... \n' + tournament)
            return
 
         if message.text.lower() == "/message_to_developer":
@@ -101,17 +101,11 @@ def message(message):
         
     if SelectState == "message_to_developer" and message.text.lower() != "/message_to_developer":
 
-        # keyboard = telebot.types.InlineKeyboardMarkup().add(telebot.types.InlineKeyboardButton("Ответить", callback_data=message.chat.id))
-
         bot.send_message(925936432, "Сообщение от: " + "\n" + str(message.chat.id) + "\n" + str(message.html_text))
 
         bot.send_message(message.chat.id, "Отправил")
         main.query_change_state("main", message.chat.id)
         bot.send_message(message.chat.id, 'Если хочешь еще раз написать разработчику, напиши команду /message_to_developer')
-
-# @bot.callback_query_handler(func=lambda call: True)
-# def callback_query(call):
-#     print(call)
 
 
 
@@ -132,16 +126,16 @@ def push_message():
                             bot.send_message(user[0], "В твоем городе появился турнир \n" + tournament[1])
                             main.message_was_send(user[0], tournament[0])
     except Exception as e:
-            print(e) # do not handle error #403
+            print(e) 
     except AssertionError:
-            print( "!!!!!!! user has been blocked !!!!!!!" ) # do not handle error #403
+            print( "!!!!!!! user has been blocked !!!!!!!" ) 
 def backup():
     try:
         os.system("mysqldump -u root tournament_go > /tmp/tournament_go.sql")
     except Exception as e:
         print(e) 
 
-def background():#test 9
+def background():
     while True:
         main.download_page("https://gofederation.ru/tournaments/", "current.html"),  # скачивание актуальной версии терниров
         main.compare("current.html", "old.html"),  # сравнение
@@ -152,7 +146,7 @@ def background():#test 9
         main.del_message_was_send(),  # очистка отправленных сообщений
         main.main(),  # добавление новых турниров в основную таблицу
         main.delete_old_tournaments(),  # удаление устаревших по дате турниров из основной таблицы
-        #backup() #бэкап бд
+        backup() #бэкап бд
 
         time.sleep(10)
     
