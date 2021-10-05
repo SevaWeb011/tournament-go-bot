@@ -23,6 +23,19 @@
       host: '%'
       state: present
 
+  - name: copy backup file
+    ansible.builtin.copy:
+      src: ./backup.py 
+      dest: /tmp/backup.py
+      owner: foilv
+      mode: '0644'
+
+  - name: run script
+    ansible.builtin.cron:
+      name: "backup"
+      hour: "12"
+      job: "/tmp/backup.py"
+
   - name: start a container
     community.docker.docker_container:
       name: Bot

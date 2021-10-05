@@ -129,11 +129,6 @@ def push_message():
             print(e) 
     except AssertionError:
             print( "!!!!!!! user has been blocked !!!!!!!" ) 
-def backup():
-    try:
-        os.system("mysqldump -u root -p${{PASSWORD}} tournament_go > /tmp/tournament_go.sql")
-    except Exception as e:
-        print(e) 
 
 def background():
     while True:
@@ -146,7 +141,6 @@ def background():
         main.del_message_was_send(),  # очистка отправленных сообщений
         main.main(),  # добавление новых турниров в основную таблицу
         main.delete_old_tournaments(),  # удаление устаревших по дате турниров из основной таблицы
-        backup() #бэкап бд
 
         time.sleep(10)
     
