@@ -26,7 +26,7 @@
   - name: start a container
     community.docker.docker_container:
       name: Bot
-      image: foilv/tournaments_go:bot10
+      image: foilv/tournaments_go:bot11
       state: started
       env:
         HOST: "{{ HOST }}"
