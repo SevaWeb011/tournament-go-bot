@@ -26,7 +26,7 @@
   - name: start a container
     community.docker.docker_container:
       name: Bot
-      image: foilv/tournaments_go:bot9
+      image: foilv/tournaments_go:bot10
       state: started
       env:
         HOST: "{{ HOST }}"
@@ -34,10 +34,5 @@
         USER: "foilv"
         PASSWORD: "{{ PASSWORD }}"
         BOT: "{{ BOT }}"
-      # env: 
-      #   HOST: 194.32.248.108
-      #   DATABASE: tournament_go
-      #   USER: foilv
-      #   PASSWORD: cat secret1.json | jq '.PASSWORD' 
-      #   BOT: cat secret1.json | jq '.BOT'
+
 
