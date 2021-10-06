@@ -17,6 +17,11 @@ def message(message):
 
     towns = types.ReplyKeyboardMarkup(resize_keyboard=True)
 
+    age = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    age1 = types.KeyboardButton('Я ребенок (до 18 лет)')
+    age2 = types.KeyboardButton('Я взрослый')
+    age.add(age1, age2)
+
     navigation = types.ReplyKeyboardMarkup(resize_keyboard=True)
     nav1 = types.KeyboardButton('далее')
     nav2 = types.KeyboardButton('стоп')
@@ -30,6 +35,13 @@ def message(message):
         message.chat.last_name,
         message.chat.username,
         state_user
+    ]
+
+    users_up_to_20 = [
+        message.chat.id,
+        message.chat.first_name,
+        message.chat.last_name,
+        message.chat.username,
     ]
 
     main.query_users(users)
@@ -54,10 +66,23 @@ def message(message):
             bot.send_message(message.chat.id, 'Выбери город', reply_markup=towns)
        
         if message.html_text == 'стоп':
-            main.query_change_state("main", message.chat.id)
-            bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name, reply_markup=types.ReplyKeyboardRemove())
+            main.query_change_state("age_category", message.chat.id)
+            SelectState = main.selectState(message.chat.id)
+            #bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name, reply_markup=types.ReplyKeyboardRemove())
             listCity.clear()
-       
+
+    if SelectState == "age_category":
+        bot.send_message(message.chat.id, 'Выбери свою категорию. Это нужно, чтобы я фильтровал для тебя турниры. В категории я ребенок, присылаюся все турниры. В категории я взрослый, только взрослые турниры.', reply_markup=age)
+        if message.text.lower() == "Я ребенок (до 18 лет)":
+            main.add_user_up_to_20_years_old(users_up_to_20)
+            main.query_change_state("main", message.chat.id)
+            SelectState = main.selectState(message.chat.id)
+            bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name, reply_markup=types.ReplyKeyboardRemove())
+
+        if message.text.lower() == "Я взрослый":
+            main.query_change_state("main", message.chat.id)
+            SelectState = main.selectState(message.chat.id)
+            bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name, reply_markup=types.ReplyKeyboardRemove())
 
     if SelectState == "main":
         if message.text.lower() == "/start":
@@ -80,7 +105,9 @@ def message(message):
         
         if message.text.lower() == "/tournaments_in_my_city":
            for tournament in main.all_tournaments_in_city(message.chat.id):
-                bot.send_message(message.chat.id, 'Турнир в твоем городе 🏆... \n' + tournament)
+                bot.send_message(message.chat.id, '🏆... \n' + tournament)
+                if tournament.len() == 0:
+                    bot.send_message(message.chat.id, 'В твоем городе пока что нет запланированных турниров :(')
            return
 
         if message.text.lower() == "/message_to_developer":
@@ -93,7 +120,71 @@ def message(message):
             main.remove_city_for_user(message.chat.id)
             main.query_change_state("city_selection", message.chat.id)
             SelectState = main.selectState(message.chat.id)
-            bot.send_message(message.chat.id, 'Я очистил твои города, выбирай новые. Если клавиатура не появилась нажми команду /start', reply_markup=towns)
+            bot.send_message(message.chat.id, 'Я очистил твои города, выбирай новые. Если клавиатура с городами не появилась, напиши команду /start', reply_markup=towns)
+            return
+
+        if message.text.lower() == "/subscribe_to_childrens_tournaments":
+            main.query_change_state("main_child", message.chat.id)
+            SelectState = main.selectState(message.chat.id)
+            bot.send_message(message.chat.id, 'Ты подписался на рассылку детских турниров. Это можно отменить командой /become an adult')
+            return
+
+        if message.text.lower() == "/become an adult":
+            bot.send_message(message.chat.id, 'Ты уже находишься во взрослой категории.')
+            return
+
+        else: 
+            bot.send_message(message.chat.id, 'Я тебя не понимаю, напиши что-нибудь другое :(')
+
+    if SelectState == "main_child":
+
+        if message.text.lower() == "/start":
+            bot.send_message(message.chat.id, 'Здравствуй, ' + message.chat.first_name)
+            return
+       
+        if message.text.lower() == "/tournaments":
+            for tournament in main.all_tournaments():
+                bot.send_message(message.chat.id, '🏆 \n' + tournament)
+            for tournament in main.all_tournaments20():
+                bot.send_message(message.chat.id, '======================== \n' + tournament)
+            return
+        
+        if message.text.lower() == "/weekend_tournaments":
+            bot.send_message(message.chat.id, 'Турниры на выходные 👀 ... \n\n' + main.weekend_tournaments())
+            bot.send_message(message.chat.id, 'Детские турниры на выходные 👀 ... \n\n' + main.weekend_tournaments20())
+            return
+
+        if message.text.lower() == "/my_city":
+            for city in main.my_city(message.chat.id):
+                bot.send_message(message.chat.id, city)
+            return
+
+        if message.text.lower() == "/message_to_developer":
+            bot.send_message(message.chat.id, 'Ограничены права. Ты не можешь написать разработчику.')
+            return
+        
+        if message.text.lower() == "/tournaments_in_my_city":
+           for tournament in main.all_tournaments_in_city(message.chat.id):
+                bot.send_message(message.chat.id, 'Турнир в твоем городе 🏆... \n' + tournament)
+                if tournament.len() == 0:
+                    bot.send_message(message.chat.id, 'В твоем городе пока что нет запланированных турниров :(')
+           return
+
+        if message.text.lower() == "/change_city":
+            main.remove_city_for_user(message.chat.id)
+            main.query_change_state("city_selection", message.chat.id)
+            SelectState = main.selectState(message.chat.id)
+            bot.send_message(message.chat.id, 'Я очистил твои города, выбирай новые. Если клавиатура с городами не появилась нажми команду /start', reply_markup=towns)
+            return
+
+        if message.text.lower() == "/become an adult":
+            main.query_change_state("main", message.chat.id)
+            SelectState = main.selectState(message.chat.id)
+            bot.send_message(message.chat.id, 'Ты отписался от рассылки детских турниров. Чтобы снова получать детские турниры напиши команду /subscribe_to_childrens_tournaments')
+            return
+
+        if message.text.lower() == "/subscribe_to_childrens_tournaments":
+            bot.send_message(message.chat.id, 'Ты уже находишься в детской категории')
             return
 
         else: 
@@ -140,7 +231,9 @@ def background():
         main.delete_all_from_NEW(),  # удаление турниров из новых
         main.del_message_was_send(),  # очистка отправленных сообщений
         main.main(),  # добавление новых турниров в основную таблицу
+        main.main20(), # добавление новых детских турниров в основную таблицу
         main.delete_old_tournaments(),  # удаление устаревших по дате турниров из основной таблицы
+        main.delete_old_tournaments20(),  # удаление устаревших по дате детских турниров из основной таблицы
 
         time.sleep(10)
     

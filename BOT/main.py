@@ -47,7 +47,7 @@ def copy_current_to_old(old_page, current_page): # функция для пер�
             old.close()
             current.close()
 
-def check_exist_file(name): #
+def check_exist_file(name): 
     if not os.path.isfile(name):
         with open(name, 'w'): pass
 
@@ -68,9 +68,30 @@ def insert_tournament(tournaments): #добавляет турниры в баз
             cursor.close()
             conn.close()
 
+def insert_tournament20(tournaments20): #добавляет детские турниры в базу данных
+    for tour20 in tournaments20:
+        query = "INSERT INTO tournaments_up_to_20 (t_start, t_end, t_name, city, link) VALUES(%s, %s, %s, %s, %s)"
+
+        try:
+            dbconfig = read_db_config()
+            conn = MySQLConnection(**dbconfig)
+            cursor = conn.cursor()
+            cursor.execute(query, [tour20.start, tour20.end, tour20.name, tour20.city, tour20.link])
+            conn.commit()
+        except Error as e:
+            print('Error:', e)
+
+        finally:
+            cursor.close()
+            conn.close()
+
 def main(): #связывает 2 функции insert_tournament и getText
     tournaments = getText()
     insert_tournament(tournaments)
+
+def main20(): #связывает 2 функции insert_tournament20 и getText_up_to_20
+    tournaments20 = getText_up_to_20()
+    insert_tournament20(tournaments20)
 
 def getText(): #получает текст для вставки новых турниров в базу данных
     html = open('difference.html')
@@ -84,9 +105,7 @@ def getText(): #получает текст для вставки новых т�
         tour = tournament.Tournament()
 
         for i in td:
-            if 'class="m"' in str(i):
-                continue
-
+           
             if "padding-right" in str(i):
                 text_date = i.text.replace("\xa0-\xa0", "")
                 format_string = "%d.%m.%Y"
@@ -106,16 +125,92 @@ def getText(): #получает текст для вставки новых т�
                 tour.setName(t_name)
                 continue
 
-            link = "https://gofederation.ru" + i.previousSibling.next.attrs['href']
+            link = "https://gofederation.ru" + str(a[0].attrs['href'])
             tour.setLink(link)
             
             city = i.text.replace("Сервер", "")
             tour.setCity(city)
 
+        is_children_tournament = False
         if tour.name != "":
-            tournaments.append(tour)
+            for categories in set_children_categories():
+                if categories in tour.name:
+                    is_children_tournament = True
+                    break
+            if not is_children_tournament:
+                tournaments.append(tour)
 
-    return tournaments #t
+    return tournaments
+
+def getText_up_to_20(): #получает текст для вставки детских новых турниров в базу данных
+    html = open('difference.html')
+    root = BeautifulSoup(html, 'lxml')
+    tr = root.select('tr')
+    tournaments20 = []
+
+    for t in tr:
+        td = t.select('td')
+        a = t.select('a')
+        tour20 = tournament.Tournament20()
+
+        for i in td:
+           
+            if "padding-right" in str(i):
+                text_date = i.text.replace("\xa0-\xa0", "")
+                format_string = "%d.%m.%Y"
+                t_start = datetime.strptime(text_date, format_string).strftime("%Y-%m-%d")
+                tour20.setStart(t_start)
+                continue
+
+            if "padding-left" in str(i):
+                text_date = i.text
+                format_string = "%d.%m.%Y"
+                t_end = datetime.strptime(text_date, format_string).strftime("%Y-%m-%d")
+                tour20.setEnd(t_end)
+                continue
+
+            if "tournament" in str(i):
+                t_name = i.text.replace(" (", ", ").replace(")", "")
+                tour20.setName(t_name)
+                continue
+
+            link = "https://gofederation.ru" + str(a[0].attrs['href'])
+            tour20.setLink(link)
+            
+            city = i.text.replace("Сервер", "")
+            tour20.setCity(city)
+
+        is_children_tournament = False
+        if tour20.name != "":
+            for categories in set_children_categories():
+                if categories in tour20.name:
+                    is_children_tournament = True
+                    break
+            if is_children_tournament:
+                tournaments20.append(tour20)
+                is_children_tournament = False
+
+    return tournaments20
+
+def set_children_categories(): #запрос на получение списка категорий
+
+    children_categories = []
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("SELECT categories FROM `children_categories`;")
+        records = cursor.fetchall()
+        for categories in records:
+            children_categories.append(categories[0])
+
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+    return children_categories
 
 def delete_old_tournaments(): #удаляет старые турниры, у которых дата старта меньше тукущей даты
     try:
@@ -124,6 +219,25 @@ def delete_old_tournaments(): #удаляет старые турниры, у к
         cursor = conn.cursor()
         date_var = str(date())
         sql = "DELETE FROM tournament_go WHERE DATE(t_start) < DATE(%s);"
+        params = [date_var]
+        cursor.execute(sql, params)
+        conn.commit()
+        
+
+    except Error as e:
+        print(e)
+
+    finally:
+        cursor.close()
+        conn.close()
+
+def delete_old_tournaments20(): #удаляет старые детские турниры, у которых дата старта меньше тукущей даты
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        date_var = str(date())
+        sql = "DELETE FROM tournaments_up_to_20 WHERE DATE(t_start) < DATE(%s);"
         params = [date_var]
         cursor.execute(sql, params)
         conn.commit()
@@ -161,6 +275,32 @@ def all_tournaments(): #выполняет запрос на вывод поль
         cursor.close()
         conn.close()
         return all_tournaments
+
+def all_tournaments20(): #выполняет запрос на вывод пользователю всех детских туниров
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("SELECT t_start, t_end, t_name, city, link FROM tournaments_up_to_20;")
+        all_tournaments20 = []
+        result = cursor.fetchall()
+        for item in result:
+            tournament = "Начало: " + str(item[0]) + "\n"
+            tournament += "Конец: " + str(item[1]) + "\n\n"
+            tournament += "Название: " + item[2] + "\n\n"
+            tournament += "Город: " + item[3] + "\n\n"
+            tournament += "Подробнее: " + item[4] + "\n"
+            all_tournaments20.append(tournament)
+            
+        conn.commit()
+
+    except Error as e:
+        print(e)
+
+    finally:
+        cursor.close()
+        conn.close()
+        return all_tournaments20
 
 def all_tournaments_in_city(chatID): #выполняет запрос на вывод пользователю всех туниров в его городе
     try:
@@ -218,6 +358,33 @@ def weekend_tournaments(): #выполняет запрос на вывод по
         cursor.close()
         conn.close()
         return tournament
+
+def weekend_tournaments20(): #выполняет запрос на вывод пользователю детских турниров, которые состоятся на выходных текущей недели
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("SELECT t_start, t_end, t_name, city, link FROM tournaments_up_to_20;")
+        tournament20 = ""
+        result = cursor.fetchall()
+
+        for item in result:
+            if item[0] == get_saturday() or item[0] == get_sunday():
+                tournament20 += "Начало: " + str(item[0]) + "\n"
+                tournament20 += "Конец: " + str(item[1]) + "\n\n"
+                tournament20 += "Название: " + item[2] + "\n\n"
+                tournament20 += "Город: " + item[3] + "\n\n"
+                tournament20 += "Подробнее: " + item[4] + "\n\n"
+               
+        conn.commit()
+
+    except Error as e:
+        print(e)
+
+    finally:
+        cursor.close()
+        conn.close()
+        return tournament20
 
 def get_saturday(): #эта функция получает дату субботы текущей недели 
     num_date = datetime.now().date().weekday()
@@ -587,6 +754,7 @@ def remove_city_for_user(userID):
     finally:
         cursor.close()
         conn.close()
+
 
 # if __name__ == '__main__':
     
