@@ -133,12 +133,13 @@ def getText(): #получает текст для вставки новых т�
 
         is_children_tournament = False
         if tour.name != "":
-            for categories in set_children_categories():
-                if categories in tour.name:
-                    is_children_tournament = True
-                    break
-            if not is_children_tournament:
-                tournaments.append(tour)
+            if tour.start >= date():
+                for categories in set_children_categories():
+                    if categories in tour.name:
+                        is_children_tournament = True
+                        break
+                if not is_children_tournament:
+                    tournaments.append(tour)
 
     return tournaments
 
@@ -182,13 +183,14 @@ def getText_up_to_20(): #получает текст для вставки де�
 
         is_children_tournament = False
         if tour20.name != "":
-            for categories in set_children_categories():
-                if categories in tour20.name:
-                    is_children_tournament = True
-                    break
-            if is_children_tournament:
-                tournaments20.append(tour20)
-                is_children_tournament = False
+            if tour20.start >= date():
+                for categories in set_children_categories():
+                    if categories in tour20.name:
+                        is_children_tournament = True
+                        break
+                if is_children_tournament:
+                    tournaments20.append(tour20)
+                    is_children_tournament = False
 
     return tournaments20
 
@@ -450,6 +452,26 @@ def check_exist_user(chatID): #проверка записи пользоват�
     finally:
         conn.close()
 
+def check_exist_user_up_to_20(chatID): #проверка записи детского пользователя, чтобы не записывался один пользователь несколько раз
+
+    query = "SELECT * FROM `user_up_to_20` WHERE id_User='" + str(chatID) + "';"
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute(query)
+
+        if len(cursor.fetchall()) != 0:
+            return True
+        else:
+            return False
+
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        conn.close()
+
 def query_users(users): #выполнение запроса на заполнение данных о пользователе
 
     if check_exist_user(users[0]):
@@ -596,12 +618,50 @@ def main_NEW(): #связывает 2 функции insert_NEW_tournament и ge
     tournaments = getText()
     insert_NEW_tournament(tournaments)
 
+def insert_NEW_tournament_up_to_20(tournaments20): #функция записывает новые турниры в таблицу НОВЫЕ турниры го, рассылает, записывает в обычную таблицу, удаляет из новых турниров 
+    for tour in tournaments20:
+        query = "INSERT INTO NEW_tournament_up_to_20 (t_start, t_end, t_name, city, link) VALUES(%s, %s, %s, %s, %s)"
+
+        try:
+            dbconfig = read_db_config()
+            conn = MySQLConnection(**dbconfig)
+            cursor = conn.cursor()
+            cursor.execute(query, [tour.start, tour.end, tour.name, tour.city, tour.link])
+            conn.commit()
+        except Error as e:
+            print('Error:', e)
+
+        finally:
+            cursor.close()
+            conn.close()
+
+def main_NEW_up_to_20(): #связывает 2 функции insert_NEW_tournament_up_to_20 и getText_up_to_20
+    tournaments20 = getText_up_to_20()
+    insert_NEW_tournament_up_to_20(tournaments20)
+
 def all_cities_from_new_tournaments():
     try:
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
         cursor.execute("SELECT city FROM NEW_tournament_go")
+        result = cursor.fetchall()
+        conn.commit()
+
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+        return result
+
+def all_cities_from_new_tournaments_20():
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("SELECT city FROM NEW_tournament_up_to_20")
         result = cursor.fetchall()
         conn.commit()
 
@@ -647,6 +707,23 @@ def id_user_where_city_in_NEW():
         conn.close()
         return result
 
+def id_user_where_city_in_NEW_20():
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("SELECT id_user FROM UserCity WHERE city in (SELECT city FROM NEW_tournament_up_to_20)")
+        result = cursor.fetchall()
+        conn.commit()
+
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+        return result
+
 def all_tournaments_in_city_NEW(chatID): #выполняет запрос на вывод пользователю всех туниров в его городе
     try:
         dbconfig = read_db_config()
@@ -677,12 +754,57 @@ def all_tournaments_in_city_NEW(chatID): #выполняет запрос на �
         conn.close()
         return all_tournaments
 
+def all_tournaments_in_city_NEW_20(chatID): #выполняет запрос на вывод пользователю всех туниров в его городе
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, t_start, t_end, t_name, city, link FROM NEW_tournament_up_to_20;")
+        all_tournaments = []
+        result = cursor.fetchall()
+
+        city_user = my_city(chatID)
+
+        for res in result:
+            if res[4] in city_user:
+                tournament = "Начало: " + str(res[1]) + "\n"
+                tournament += "Конец: " + str(res[2]) + "\n\n"
+                tournament += "Название: " + res[3] + "\n\n"
+                tournament += "Город: " + res[4] + "\n\n"
+                tournament += "Подробнее: " + res[5] + "\n"
+                all_tournaments.append([res[0], tournament])
+
+        conn.commit()
+
+    except Error as e:
+        print(e)
+
+    finally:
+        cursor.close()
+        conn.close()
+        return all_tournaments
+
 def delete_all_from_NEW():
     try:
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
         cursor.execute("DELETE FROM NEW_tournament_go")
+        conn.commit()
+
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+
+def delete_all_from_NEW_20():
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM NEW_tournament_up_to_20")
         conn.commit()
 
     except Error as e:
@@ -755,6 +877,60 @@ def remove_city_for_user(userID):
         cursor.close()
         conn.close()
 
+def add_user_up_to_20(users_up_to_20):
+    
+    # if check_exist_user_up_to_20(users_up_to_20[0]):
+    #     return
+    
+    query = "INSERT INTO `users_up_to_20` (id_User, first_name, last_name, username) VALUES( %s, %s, %s, %s)"
+    
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute(query, users_up_to_20)
+        conn.commit()
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+
+def removal_from_child_category(userID):
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM users_up_to_20 WHERE id_User = '" + str(userID) + "';")
+        conn.commit()
+
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+
+def exists_in_children_category(userID):
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        query = "SELECT * FROM users_up_to_20 WHERE id_User = '" + str(userID) + "';"
+        cursor.execute(query)
+        result = cursor.fetchall()
+        conn.commit()
+
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()    
+        return result
+
+    
 
 # if __name__ == '__main__':
     
