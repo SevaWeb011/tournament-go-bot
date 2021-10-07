@@ -133,13 +133,13 @@ def getText(): #получает текст для вставки новых т�
 
         is_children_tournament = False
         if tour.name != "":
-            if tour.start >= date():
-                for categories in set_children_categories():
-                    if categories in tour.name:
-                        is_children_tournament = True
-                        break
-                if not is_children_tournament:
-                    tournaments.append(tour)
+            #if tour.start >= date():
+            for categories in set_children_categories():
+                if categories in tour.name:
+                    is_children_tournament = True
+                    break
+            if not is_children_tournament:
+                tournaments.append(tour)
 
     return tournaments
 
@@ -183,14 +183,14 @@ def getText_up_to_20(): #получает текст для вставки де�
 
         is_children_tournament = False
         if tour20.name != "":
-            if tour20.start >= date():
-                for categories in set_children_categories():
-                    if categories in tour20.name:
-                        is_children_tournament = True
-                        break
-                if is_children_tournament:
-                    tournaments20.append(tour20)
-                    is_children_tournament = False
+            #if tour20.start >= date():
+            for categories in set_children_categories():
+                if categories in tour20.name:
+                    is_children_tournament = True
+                    break
+            if is_children_tournament:
+                tournaments20.append(tour20)
+                is_children_tournament = False
 
     return tournaments20
 
@@ -334,6 +334,36 @@ def all_tournaments_in_city(chatID): #выполняет запрос на вы�
         conn.close()
         return all_tournaments
 
+def all_tournaments_in_city_up_to_20(chatID): #выполняет запрос на вывод пользователю всех детских туниров в его городе
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("SELECT t_start, t_end, t_name, city, link FROM tournaments_up_to_20;")
+        all_tournaments = []
+        result = cursor.fetchall()
+
+        city_user = my_city(chatID)
+
+        for res in result:
+            if res[3] in city_user:
+                tournament = "Начало: " + str(res[0]) + "\n"
+                tournament += "Конец: " + str(res[1]) + "\n\n"
+                tournament += "Название: " + res[2] + "\n\n"
+                tournament += "Город: " + res[3] + "\n\n"
+                tournament += "Подробнее: " + res[4] + "\n"
+                all_tournaments.append(tournament)
+
+        conn.commit()
+
+    except Error as e:
+        print(e)
+
+    finally:
+        cursor.close()
+        conn.close()
+        return all_tournaments
+
 def weekend_tournaments(): #выполняет запрос на вывод пользователю турниров, которые состоятся на выходных текущей недели
     try:
         dbconfig = read_db_config()
@@ -350,6 +380,8 @@ def weekend_tournaments(): #выполняет запрос на вывод по
                 tournament += "Название: " + item[2] + "\n\n"
                 tournament += "Город: " + item[3] + "\n\n"
                 tournament += "Подробнее: " + item[4] + "\n\n"
+                tournament += "==============================" + "\n\n"
+
                
         conn.commit()
 
@@ -377,6 +409,7 @@ def weekend_tournaments20(): #выполняет запрос на вывод п
                 tournament20 += "Название: " + item[2] + "\n\n"
                 tournament20 += "Город: " + item[3] + "\n\n"
                 tournament20 += "Подробнее: " + item[4] + "\n\n"
+                tournament20 += "==============================" + "\n\n"
                
         conn.commit()
 
@@ -829,12 +862,45 @@ def message_was_send(userID, tournament):
         cursor.close()
         conn.close()
 
+def message_was_send_20(userID, tournament):
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO message_was_send_20 (id_user, tournament) VALUES ('" + str(userID) + "', '" + str(tournament) + "')")
+        conn.commit()
+
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+
 def Select_message_was_send(userID, tournament):
     try:
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
         query = "SELECT id_user, tournament FROM message_was_send WHERE id_user = '" + str(userID) + "' AND tournament = '" + str(tournament) + "';"
+        cursor.execute(query)
+        result = cursor.fetchall()
+        conn.commit()
+
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+        return result
+
+def Select_message_was_send_20(userID, tournament):
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        query = "SELECT id_user, tournament FROM message_was_send_20 WHERE id_user = '" + str(userID) + "' AND tournament = '" + str(tournament) + "';"
         cursor.execute(query)
         result = cursor.fetchall()
         conn.commit()
@@ -930,7 +996,23 @@ def exists_in_children_category(userID):
         conn.close()    
         return result
 
-    
+def if_is_tournament_up_to_20(userID, state):
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        query = "SELECT id_User FROM user_BotGo WHERE state_user = '" + str(state) + "' AND id_User = '" + str(userID) + "';"
+        cursor.execute(query)
+        result = cursor.fetchall()
+        conn.commit()
+
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()    
+        return result 
 
 # if __name__ == '__main__':
     
