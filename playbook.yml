@@ -33,13 +33,13 @@
   - name: run script
     ansible.builtin.cron:
       name: "backup"
-      hour: "1"
+      hour: "12"
       job: "/appBot/backup.py"
 
   - name: start a container
     community.docker.docker_container:
       name: Bot
-      image: foilv/tournaments_go:bot14
+      image: foilv/tournaments_go:bot15
       state: started
       env:
         HOST: "{{ HOST }}"
