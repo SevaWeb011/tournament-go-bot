@@ -16,3 +16,4 @@ secret.json
 Vagrantfile
 tex.sql
 .env
+tournament.sql
