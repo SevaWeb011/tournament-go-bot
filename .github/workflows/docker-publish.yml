@@ -24,9 +24,9 @@ jobs:
       - name: test1
         run: python3 test1.py
 
-      - name: run playbook
-        env:
-          ANSIBLE_HOST_KEY_CHECKING: False
-        run: ansible-playbook -i inventory.yml renew.yml --extra-vars "@secret1.json"
+      # - name: run playbook
+      #   env:
+      #     ANSIBLE_HOST_KEY_CHECKING: False
+      #   run: ansible-playbook -i inventory.yml renew.yml --extra-vars "@secret1.json"
 
           
