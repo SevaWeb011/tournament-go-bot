@@ -15,3 +15,4 @@ Vagrantfile
 secret.json
 Vagrantfile
 tex.sql
+.env
