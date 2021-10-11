@@ -114,7 +114,7 @@ def message(message):
     if SelectState == "age_category":
 
         if message.text.lower() == "я ребенок (до 18 лет)":
-            main.subscribe_to_child_change(message.chat.id, True)
+            main.subscribe_to_child_change(message.chat.id, 1)
             welcome(message.chat, mainButton)
 
         if message.text.lower() == "я взрослый":
@@ -171,7 +171,7 @@ def message(message):
             main.query_change_state("main_child", message.chat.id)
             SelectState = main.selectState(message.chat.id)
             bot.send_message(message.chat.id, 'Ты подписался на рассылку детских турниров. Это можно отменить командой /become_an_adult, или кнопкой, получать детские турниры', reply_markup=mainButton)
-            main.subscribe_to_child_change(message.chat.id, True)
+            main.subscribe_to_child_change(message.chat.id, 1)
             return
 
         if message.text.lower() == "/become_an_adult":
@@ -243,7 +243,7 @@ def message(message):
         if message.text.lower() == "/become_an_adult":
             main.query_change_state("main", message.chat.id)
             SelectState = main.selectState(message.chat.id)
-            main.subscribe_to_child_change(message.chat.id, False)
+            main.subscribe_to_child_change(message.chat.id, 0)
             bot.send_message(message.chat.id, 'Ты отписался от рассылки детских турниров. Чтобы снова получать детские турниры напиши команду /child_tournaments или кнопкой, получать детские турниры', reply_markup=mainButton)
             return
 
