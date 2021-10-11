@@ -1,15 +1,38 @@
 ---
-- hosts: all
-  become: true
+- name: tournament_go
+  hosts: bot
+  become_method: sudo
+  become: yes
+  become_user: root
+
+  vars:
+    ansible_user: foilv
+    ansible_ssh_private_key: "{{ key }}"
+    ansible_port: 22
+    ansible_connection: ssh
+    ansible_ssh_extra_args: '-o StrictHostKeyChecking=no'
 
   tasks:
 
-  - community.docker.docker_container:
-      name: bot
-      image: "{{ docker_image }}"
-      env: 
-        HOST: "192.168.3.223" 
-        DATABASE: "{{ database }}"
-        USER: "{{ newuser }}"
-        PASSWORD: "{{ newuserpass }}"
-        BOT: "{{ bot }}"
+  - name: get running container
+    docker_host_info:
+        containers: yes
+    register: docker_info
+
+  - name: Stop running containers
+    docker_container:
+      name: "{{ item }}"
+      state: stopped
+    loop: "{{ docker_info.containers | map(attribute='Id') | list }}"
+
+  - name: start a container
+    community.docker.docker_container:
+      name: Bot
+      image: foilv/tournaments_go:bot15
+      state: started
+      env:
+        HOST: "{{ HOST }}"
+        DATABASE: "tournament_go"
+        USER: "foilv"
+        PASSWORD: "{{ PASSWORD }}"
+        BOT: "{{ BOT }}"

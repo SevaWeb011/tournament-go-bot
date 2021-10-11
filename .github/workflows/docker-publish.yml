@@ -24,6 +24,6 @@ jobs:
       - name: run playbook
         env:
           ANSIBLE_HOST_KEY_CHECKING: False
-        run: ansible-playbook -i inventory.yml playbook.yml --extra-vars "@secret1.json"
+        run: ansible-playbook -i inventory.yml renew.yml --extra-vars "@secret1.json"
 
           
