@@ -5,7 +5,6 @@ from threading import Thread
 import telebot
 from telebot import types
 import main
-import requests
 
 token = os.getenv("BOT")
 bot = telebot.TeleBot(token)
@@ -45,13 +44,6 @@ def message(message):
         message.chat.last_name,
         message.chat.username,
         state_user
-    ]
-
-    users_up_to_20 = [
-        message.chat.id,
-        message.chat.first_name,
-        message.chat.last_name,
-        message.chat.username,
     ]
 
     main.query_users(users)
@@ -122,17 +114,12 @@ def message(message):
     if SelectState == "age_category":
 
         if message.text.lower() == "я ребенок (до 18 лет)":
-            main.query_change_state("main_child", message.chat.id)
-            SelectState = main.selectState(message.chat.id)
-            bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name, reply_markup=mainButton)
-            main.add_user_up_to_20(users_up_to_20)
-            return
+            main.subscribe_to_child_change(message.chat.id, True)
+            welcome(message.chat, mainButton)
 
         if message.text.lower() == "я взрослый":
-            main.query_change_state("main", message.chat.id)
-            SelectState = main.selectState(message.chat.id)
-            bot.send_message(message.chat.id, 'Добро пожаловать 👋, ' + message.chat.first_name, reply_markup=mainButton)
-            return
+            welcome(message.chat, mainButton)
+        return
 
 #=======================================================================================================
 
@@ -172,7 +159,7 @@ def message(message):
             bot.send_message(message.chat.id, 'Напиши разработчику об ошибках, неисправностях, и тп. Отправь сюда сообщение, чтобы я отправил его разработчику', reply_markup=types.ReplyKeyboardRemove())
             return
 
-        if message.text.lower() == "/change_city" or message.text.lower() == "сменить города":
+        if message.text.lower() == "/change_city" or message.text.lower() == "сменить город":
             main.remove_city_for_user(message.chat.id)
             main.query_change_state("change_city", message.chat.id)
             SelectState = main.selectState(message.chat.id)
@@ -184,7 +171,7 @@ def message(message):
             main.query_change_state("main_child", message.chat.id)
             SelectState = main.selectState(message.chat.id)
             bot.send_message(message.chat.id, 'Ты подписался на рассылку детских турниров. Это можно отменить командой /become_an_adult, или кнопкой, получать детские турниры', reply_markup=mainButton)
-            main.add_user_up_to_20(users_up_to_20)
+            main.subscribe_to_child_change(message.chat.id, True)
             return
 
         if message.text.lower() == "/become_an_adult":
@@ -256,7 +243,7 @@ def message(message):
         if message.text.lower() == "/become_an_adult":
             main.query_change_state("main", message.chat.id)
             SelectState = main.selectState(message.chat.id)
-            main.removal_from_child_category(message.chat.id)
+            main.subscribe_to_child_change(message.chat.id, False)
             bot.send_message(message.chat.id, 'Ты отписался от рассылки детских турниров. Чтобы снова получать детские турниры напиши команду /child_tournaments или кнопкой, получать детские турниры', reply_markup=mainButton)
             return
 
@@ -320,27 +307,29 @@ def push_message_up_to_20():
             print( "!!!!!!! user has been blocked !!!!!!!" )
 
 def background():
-    try:
-        while True:
-            main.download_page("https://gofederation.ru/tournaments/", "current.html"),  # скачивание актуальной версии турниров
-            main.compare("current.html", "old.html"),  # сравнение
-            main.copy_current_to_old("old.html", "current.html"),  # замена старого на новое
-            main.main_NEW(),  # запись новых турниров
-            main.main_NEW_up_to_20(), #запись новых детских турниров
-            push_message(),  # уведомление пользователей о новых турнирах
-            push_message_up_to_20(), # уведомление пользователей о новых детских турнирах
-            main.delete_all_from_NEW(),  # удаление турниров из новых
-            main.delete_all_from_NEW_20(), # удаление турниров из детских новых 
-            main.del_message_was_send(),  # очистка отправленных сообщений
-            main.main(),  # добавление новых турниров в основную таблицу
-            main.main20(), # добавление новых детских турниров в основную таблицу
-            main.delete_old_tournaments(),  # удаление устаревших по дате турниров из основной таблицы
-            main.delete_old_tournaments20(),  # удаление устаревших по дате детских турниров из основной таблицы
+    while True:
+        main.download_page("https://gofederation.ru/tournaments/", "current.html"),  # скачивание актуальной версии турниров
+        main.compare("current.html", "old.html"),  # сравнение
+        main.copy_current_to_old("old.html", "current.html"),  # замена старого на новое
+        main.main_NEW(),  # запись новых турниров
+        main.main_NEW_up_to_20(), #запись новых детских турниров
+        push_message(),  # уведомление пользователей о новых турнирах
+        push_message_up_to_20(), # уведомление пользователей о новых детских турнирах
+        main.delete_all_from_NEW(),  # удаление турниров из новых
+        main.delete_all_from_NEW_20(), # удаление турниров из детских новых 
+        main.del_message_was_send(),  # очистка отправленных сообщений
+        main.main(),  # добавление новых турниров в основную таблицу
+        main.main20(), # добавление новых детских турниров в основную таблицу
+        main.delete_old_tournaments(),  # удаление устаревших по дате турниров из основной таблицы
+        main.delete_old_tournaments20(),  # удаление устаревших по дате детских турниров из основной таблицы
 
-            time.sleep(300)
-
-    except requests.exceptions.ReadTimeout:
-        print( "!! переподключение !!" )
+        time.sleep(600)
+        
+def welcome(chat, mainButton):
+    main.query_change_state("main", chat.id)
+    SelectState = main.selectState(chat.id)
+    bot.send_message(chat.id, 'Добро пожаловать 👋, ' + chat.first_name, reply_markup=mainButton)
+    
 
 if __name__ == '__main__':
 

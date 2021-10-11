@@ -540,6 +540,22 @@ def query_change_state(state, chatID): #запрос на смену состо�
         cursor.close()
         conn.close()
 
+def subscribe_to_child_change(chatID, state): #подписка на детские турниры
+
+    query = "UPDATE user_BotGo SET is_child = '" + str(state) + "' WHERE id_User = '" + str(chatID) + "'"
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute(query, state)
+        conn.commit()
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+
 def add_city(chatID, city): #запрос на добавления пользователю города, в которых он хочет получать информацию о новых турнирах
 
     try:
@@ -943,26 +959,6 @@ def remove_city_for_user(userID):
         cursor.close()
         conn.close()
 
-def add_user_up_to_20(users_up_to_20):
-    
-    # if check_exist_user_up_to_20(users_up_to_20[0]):
-    #     return
-    
-    query = "INSERT INTO `users_up_to_20` (id_User, first_name, last_name, username) VALUES( %s, %s, %s, %s)"
-    
-    try:
-        dbconfig = read_db_config()
-        conn = MySQLConnection(**dbconfig)
-        cursor = conn.cursor()
-        cursor.execute(query, users_up_to_20)
-        conn.commit()
-    except Error as e:
-        print('Error:', e)
-
-    finally:
-        cursor.close()
-        conn.close()
-
 def removal_from_child_category(userID):
     try:
         dbconfig = read_db_config()
@@ -983,7 +979,7 @@ def exists_in_children_category(userID):
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
-        query = "SELECT * FROM users_up_to_20 WHERE id_User = '" + str(userID) + "';"
+        query = "SELECT * FROM user_BotGo WHERE id_User = '" + str(userID) + " and is_child = True';"
         cursor.execute(query)
         result = cursor.fetchall()
         conn.commit()
