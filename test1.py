@@ -1,7 +1,12 @@
-import os
+import docker
+import dockerpty
 
-def docker_run():
-    try:
-        os.system("docker run --env HOST=194.32.248.108  --env DATABASE=tournament_go --env USER=foilv --env PASSWORD=${{ secrets.PASS_ROOT }} --env BOT=${{ secrets.BOT }} foilv/tournaments_go:bot15")
-    except Exception as e:
-        print(e) 
+client = docker.Client()
+container = client.create_container(
+image='foilv/tournaments_go:bot15',
+   stdin_open=True,
+   tty=True,
+   command='/bin/sh',
+)
+client.start(container)
+dockerpty.PseudoTerminal(client, container).start()
