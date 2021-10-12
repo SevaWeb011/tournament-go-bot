@@ -1,12 +1,3 @@
-import docker
-import dockerpty
+import os
 
-client = docker.Client()
-container = client.create_container(
-image='foilv/tournaments_go:bot15',
-   stdin_open=True,
-   tty=True,
-   command='/bin/sh',
-)
-client.start(container)
-dockerpty.PseudoTerminal(client, container).start()
+os.system("docker run --env HOST=194.32.248.108  --env DATABASE=tournament_go --env USER=foilv --env PASSWORD={{ PASSWORD }} --env BOT={{ BOT }} foilv/tournaments_go:bot15")
