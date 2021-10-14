@@ -266,15 +266,14 @@ def message(message):
 
 def push_message():
     try:
-        for city in main.all_cities_from_new_tournaments():
-            if city in main.user_cities():
-                for user in main.id_user_where_city_in_NEW():
-                    all_tournaments = main.all_tournaments_in_city_NEW(user[0])
-                    for tournament in all_tournaments:
-                        result = main.Select_message_was_send(user[0], tournament[0])
-                        if len(result) == 0:
-                            bot.send_message(user[0], "В твоем городе появился турнир \n" + tournament[1])
-                            main.message_was_send(user[0], tournament[0])
+        tournaments = main.get_new_tournaments()
+        if(any(tournaments)):
+            for tour in tournaments:
+                if(any(tour)):
+                    for cityId in main.get_cities_by_new_tournament_id(tour[0]):
+                        for user in main.getUsersChatByCityId(cityId):
+                            bot.send_message(user, "В твоем городе появился турнир \n" + main.getTournomentMessageById(tour[0]))
+
     except Exception as e:
             print(e) 
     except AssertionError:
@@ -286,25 +285,26 @@ def push_message():
             # отправить этому id сообщение о турнире
 
 def push_message_up_to_20():
-    try:
-        for city in main.all_cities_from_new_tournaments_20():
-            if city in main.user_cities():
-                for user in main.id_user_where_city_in_NEW_20():
-                    all_tournaments = main.all_tournaments_in_city_NEW_20(user[0])
-                    for tournament in all_tournaments:
-                        result = main.Select_message_was_send_20(user[0], tournament[0])
-                        if len(result) == 0:
-                            state_child = "main_child"
-                            if len(main.if_is_tournament_up_to_20(user[0], state_child)) != 0:
-                                bot.send_message(user[0], "В твоем городе появился турнир \n" + tournament[1])
-                                main.message_was_send_20(user[0], tournament[0])
-                            else:
-                                print()
+    print('empty function')
+    # try:
+    #     for city in main.all_cities_from_new_tournaments_20():
+    #         if city in main.user_cities():
+    #             for user in main.id_user_where_city_in_NEW_20():
+    #                 all_tournaments = main.all_tournaments_in_city_NEW_20(user[0])
+    #                 for tournament in all_tournaments:
+    #                     result = main.Select_message_was_send_20(user[0], tournament[0])
+    #                     if len(result) == 0:
+    #                         state_child = "main_child"
+    #                         if len(main.if_is_tournament_up_to_20(user[0], state_child)) != 0:
+    #                             bot.send_message(user[0], "В твоем городе появился турнир \n" + tournament[1])
+    #                             main.message_was_send_20(user[0], tournament[0])
+    #                         else:
+    #                             print()
                                 
-    except Exception as e:
-            print(e) 
-    except AssertionError:
-            print( "!!!!!!! user has been blocked !!!!!!!" )
+    # except Exception as e:
+    #         print(e) 
+    # except AssertionError:
+    #         print( "!!!!!!! user has been blocked !!!!!!!" )
 
 def background():
     while True:
