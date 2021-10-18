@@ -53,13 +53,14 @@ def check_exist_file(name):
 
 def insert_tournament(tournaments): #добавляет турниры в базу данных
     for tour in tournaments:
-        query = "INSERT INTO tournament_go (t_start, t_end, t_name, city, link) VALUES(%s, %s, %s, %s, %s)"
+        query = "INSERT INTO tournament_go (t_start, t_end, t_name, city_id, link) VALUES(%s, %s, %s, %s, %s)"
 
         try:
+            cityId = int(getCityIdByName(tour.city))
             dbconfig = read_db_config()
             conn = MySQLConnection(**dbconfig)
             cursor = conn.cursor()
-            cursor.execute(query, [tour.start, tour.end, tour.name, tour.city, tour.link])
+            cursor.execute(query, [tour.start, tour.end, tour.name, cityId, tour.link])
             conn.commit()
         except Error as e:
             print('Error:', e)
@@ -70,13 +71,14 @@ def insert_tournament(tournaments): #добавляет турниры в баз
 
 def insert_tournament20(tournaments20): #добавляет детские турниры в базу данных
     for tour20 in tournaments20:
-        query = "INSERT INTO tournaments_up_to_20 (t_start, t_end, t_name, city, link) VALUES(%s, %s, %s, %s, %s)"
+        query = "INSERT INTO tournaments_up_to_20 (t_start, t_end, t_name, city_id, link) VALUES(%s, %s, %s, %s, %s)"
 
         try:
+            cityId = str(getCityIdByName(tour20.city))
             dbconfig = read_db_config()
             conn = MySQLConnection(**dbconfig)
             cursor = conn.cursor()
-            cursor.execute(query, [tour20.start, tour20.end, tour20.name, tour20.city, tour20.link])
+            cursor.execute(query, [tour20.start, tour20.end, tour20.name, cityId, tour20.link])
             conn.commit()
         except Error as e:
             print('Error:', e)
@@ -129,6 +131,7 @@ def getText(): #получает текст для вставки новых т�
             tour.setLink(link)
             
             city = i.text.replace("Сервер", "")
+            city = city.replace(' ','')
             tour.setCity(city)
 
         is_children_tournament = False
@@ -179,6 +182,7 @@ def getText_up_to_20(): #получает текст для вставки де�
             tour20.setLink(link)
             
             city = i.text.replace("Сервер", "")
+            city = getCityIdByName(city)
             tour20.setCity(city)
 
         is_children_tournament = False
@@ -257,14 +261,14 @@ def all_tournaments(): #выполняет запрос на вывод поль
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
-        cursor.execute("SELECT t_start, t_end, t_name, city, link FROM tournament_go;")
+        cursor.execute("SELECT t_start, t_end, t_name, city_id, link FROM tournament_go;")
         all_tournaments = []
         result = cursor.fetchall()
         for item in result:
             tournament = "Начало: " + str(item[0]) + "\n"
             tournament += "Конец: " + str(item[1]) + "\n\n"
             tournament += "Название: " + item[2] + "\n\n"
-            tournament += "Город: " + item[3] + "\n\n"
+            tournament += "Город: " + getCityNameById(item[3]) + "\n\n"
             tournament += "Подробнее: " + item[4] + "\n"
             all_tournaments.append(tournament)
             
@@ -290,7 +294,7 @@ def all_tournaments20(): #выполняет запрос на вывод пол
             tournament = "Начало: " + str(item[0]) + "\n"
             tournament += "Конец: " + str(item[1]) + "\n\n"
             tournament += "Название: " + item[2] + "\n\n"
-            tournament += "Город: " + item[3] + "\n\n"
+            tournament += "Город: " + getCityNameById(item[3]) + "\n\n"
             tournament += "Подробнее: " + item[4] + "\n"
             all_tournaments20.append(tournament)
             
@@ -305,22 +309,23 @@ def all_tournaments20(): #выполняет запрос на вывод пол
         return all_tournaments20
 
 def all_tournaments_in_city(chatID): #выполняет запрос на вывод пользователю всех туниров в его городе
+    all_tournaments = []
     try:
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
-        cursor.execute("SELECT t_start, t_end, t_name, city, link FROM tournament_go;")
-        all_tournaments = []
+        cursor.execute("SELECT t_start, t_end, t_name, city_id, link FROM tournament_go;")
         result = cursor.fetchall()
 
-        city_user = my_city(chatID)
+        userId = getUserIdByChatId(chatID)
+        city_user = getCitiesByUserId(userId)
 
         for res in result:
-            if res[3] in city_user:
+            if str(res[3]) in city_user:
                 tournament = "Начало: " + str(res[0]) + "\n"
                 tournament += "Конец: " + str(res[1]) + "\n\n"
                 tournament += "Название: " + res[2] + "\n\n"
-                tournament += "Город: " + res[3] + "\n\n"
+                tournament += "Город: " + getCityNameById(res[3]) + "\n\n"
                 tournament += "Подробнее: " + res[4] + "\n"
                 all_tournaments.append(tournament)
 
@@ -333,6 +338,28 @@ def all_tournaments_in_city(chatID): #выполняет запрос на вы�
         cursor.close()
         conn.close()
         return all_tournaments
+
+def getCitiesByUserId(userId):
+        try:
+            ids = []
+            dbconfig = read_db_config()
+            conn = MySQLConnection(**dbconfig)
+            cursor = conn.cursor()
+            cursor.execute("SELECT c.id FROM Cities as c JOIN user_cities as uc ON uc.city_id = c.id JOIN user_BotGo as u ON u.id = uc.user_id WHERE uc.user_id = '" + str(userId) + "';")
+            all_tournaments = []
+            records = cursor.fetchall()
+
+            for id in records:
+                ids.append(str(id[0]))
+            conn.commit()
+
+        except Error as e:
+            print(e)
+
+        finally:
+            cursor.close()
+            conn.close()
+            return ids
 
 def all_tournaments_in_city_up_to_20(chatID): #выполняет запрос на вывод пользователю всех детских туниров в его городе
     try:
@@ -350,7 +377,7 @@ def all_tournaments_in_city_up_to_20(chatID): #выполняет запрос �
                 tournament = "Начало: " + str(res[0]) + "\n"
                 tournament += "Конец: " + str(res[1]) + "\n\n"
                 tournament += "Название: " + res[2] + "\n\n"
-                tournament += "Город: " + res[3] + "\n\n"
+                tournament += "Город: " + getCityNameById(res[3]) + "\n\n"
                 tournament += "Подробнее: " + res[4] + "\n"
                 all_tournaments.append(tournament)
 
@@ -369,7 +396,7 @@ def weekend_tournaments(): #выполняет запрос на вывод по
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
-        cursor.execute("SELECT t_start, t_end, t_name, city, link FROM tournament_go;")
+        cursor.execute("SELECT t_start, t_end, t_name, city_id, link FROM tournament_go;")
         tournament = ""
         result = cursor.fetchall()
 
@@ -378,7 +405,7 @@ def weekend_tournaments(): #выполняет запрос на вывод по
                 tournament += "Начало: " + str(item[0]) + "\n"
                 tournament += "Конец: " + str(item[1]) + "\n\n"
                 tournament += "Название: " + item[2] + "\n\n"
-                tournament += "Город: " + item[3] + "\n\n"
+                tournament += "Город: " + getCityNameById(item[3]) + "\n\n"
                 tournament += "Подробнее: " + item[4] + "\n\n"
                 tournament += "==============================" + "\n\n"
 
@@ -407,7 +434,7 @@ def weekend_tournaments20(): #выполняет запрос на вывод п
                 tournament20 += "Начало: " + str(item[0]) + "\n"
                 tournament20 += "Конец: " + str(item[1]) + "\n\n"
                 tournament20 += "Название: " + item[2] + "\n\n"
-                tournament20 += "Город: " + item[3] + "\n\n"
+                tournament20 += "Город: " + getCityNameById(item[3]) + "\n\n"
                 tournament20 += "Подробнее: " + item[4] + "\n\n"
                 tournament20 += "==============================" + "\n\n"
                
@@ -559,10 +586,12 @@ def subscribe_to_child_change(chatID, state): #подписка на детск�
 def add_city(chatID, city): #запрос на добавления пользователю города, в которых он хочет получать информацию о новых турнирах
 
     try:
+        userId = getUserIdByChatId(chatID)
+        cityId = getCityIdByName(city)
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO UserCity (id_user, city) VALUES ('" + str(chatID) + "', '" + str(city) + "');")
+        cursor.execute("INSERT INTO user_cities (user_id, city_id) VALUES ('" + str(userId) + "', '" + str(cityId) + "');")
         conn.commit()
     except Error as e:
         print('Error:', e)
@@ -596,7 +625,7 @@ def my_city(chatID): ####
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
-        cursor.execute("SELECT city FROM UserCity WHERE id_user = '" + str(chatID) + "'")
+        cursor.execute("SELECT title FROM Cities as c JOIN user_cities as uc ON uc.city_id = c.id JOIN user_BotGo as u ON u.id = uc.user_id WHERE u.id_User = '" + str(chatID) + "'")
         records = cursor.fetchall()
         my_city = []
         for item in records:
@@ -629,32 +658,16 @@ def get_all_cities(): #запрос на получение списка гор�
         conn.close()
     return all_city
 
-def tournaments_in_my_city(chatID):
-    tournament_in_my_city = ""
-    try:
-        dbconfig = read_db_config()
-        conn = MySQLConnection(**dbconfig)
-        cursor = conn.cursor()
-        cursor.execute("SELECT city FROM UserCity WHERE id_user = '" + str(chatID) + "'")
-        records = cursor.fetchall()
-        tournament_in_my_city = records
-    except Error as e:
-        print('Error:', e)
-
-    finally:
-        cursor.close()
-        conn.close()
-    return tournament_in_my_city
-
 def insert_NEW_tournament(tournaments): #функция записывает новые турниры в таблицу НОВЫЕ турниры го, рассылает, записывает в обычную таблицу, удаляет из новых турниров 
     for tour in tournaments:
-        query = "INSERT INTO NEW_tournament_go (t_start, t_end, t_name, city, link) VALUES(%s, %s, %s, %s, %s)"
+        query = "INSERT INTO NEW_tournament_go (t_start, t_end, t_name, city_id, link) VALUES(%s, %s, %s, %s, %s)"
 
         try:
             dbconfig = read_db_config()
             conn = MySQLConnection(**dbconfig)
             cursor = conn.cursor()
-            cursor.execute(query, [tour.start, tour.end, tour.name, tour.city, tour.link])
+            cityId = getCityIdByName(tour.city)
+            cursor.execute(query, [tour.start, tour.end, tour.name, cityId, tour.link])
             conn.commit()
         except Error as e:
             print('Error:', e)
@@ -669,7 +682,7 @@ def main_NEW(): #связывает 2 функции insert_NEW_tournament и ge
 
 def insert_NEW_tournament_up_to_20(tournaments20): #функция записывает новые турниры в таблицу НОВЫЕ турниры го, рассылает, записывает в обычную таблицу, удаляет из новых турниров 
     for tour in tournaments20:
-        query = "INSERT INTO NEW_tournament_up_to_20 (t_start, t_end, t_name, city, link) VALUES(%s, %s, %s, %s, %s)"
+        query = "INSERT INTO NEW_tournament_up_to_20 (t_start, t_end, t_name, city_id, link) VALUES(%s, %s, %s, %s, %s)"
 
         try:
             dbconfig = read_db_config()
@@ -688,12 +701,13 @@ def main_NEW_up_to_20(): #связывает 2 функции insert_NEW_tournam
     tournaments20 = getText_up_to_20()
     insert_NEW_tournament_up_to_20(tournaments20)
 
-def all_cities_from_new_tournaments():
+def get_new_tournaments():
+
     try:
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
-        cursor.execute("SELECT city FROM NEW_tournament_go")
+        cursor.execute("SELECT * FROM NEW_tournament_go")
         result = cursor.fetchall()
         conn.commit()
 
@@ -705,12 +719,13 @@ def all_cities_from_new_tournaments():
         conn.close()
         return result
 
-def all_cities_from_new_tournaments_20():
+def get_new_tournaments_20():
+
     try:
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
-        cursor.execute("SELECT city FROM NEW_tournament_up_to_20")
+        cursor.execute("SELECT * FROM NEW_tournament_up_to_20")
         result = cursor.fetchall()
         conn.commit()
 
@@ -722,13 +737,17 @@ def all_cities_from_new_tournaments_20():
         conn.close()
         return result
 
-def user_cities():
+def get_cities_by_new_tournament_id(tournamentId):
+
     try:
+        ids = []
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
-        cursor.execute("SELECT city FROM UserCity")
-        result = cursor.fetchall()
+        cursor.execute("SELECT Cities.id FROM Cities JOIN NEW_tournament_go as t ON t.city_id = Cities.id where t.id = '" + str(tournamentId) + "'")
+        records = cursor.fetchall()
+        for id in records:
+            ids.append(str(id[0]))
         conn.commit()
 
     except Error as e:
@@ -737,48 +756,14 @@ def user_cities():
     finally:
         cursor.close()
         conn.close()
-        return result
-
-def id_user_where_city_in_NEW():
-    try:
-        dbconfig = read_db_config()
-        conn = MySQLConnection(**dbconfig)
-        cursor = conn.cursor()
-        cursor.execute("SELECT id_user FROM UserCity WHERE city in (SELECT city FROM NEW_tournament_go)")
-        result = cursor.fetchall()
-        conn.commit()
-
-    except Error as e:
-        print('Error:', e)
-
-    finally:
-        cursor.close()
-        conn.close()
-        return result
-
-def id_user_where_city_in_NEW_20():
-    try:
-        dbconfig = read_db_config()
-        conn = MySQLConnection(**dbconfig)
-        cursor = conn.cursor()
-        cursor.execute("SELECT id_user FROM UserCity WHERE city in (SELECT city FROM NEW_tournament_up_to_20)")
-        result = cursor.fetchall()
-        conn.commit()
-
-    except Error as e:
-        print('Error:', e)
-
-    finally:
-        cursor.close()
-        conn.close()
-        return result
+        return ids
 
 def all_tournaments_in_city_NEW(chatID): #выполняет запрос на вывод пользователю всех туниров в его городе
     try:
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
-        cursor.execute("SELECT id, t_start, t_end, t_name, city, link FROM NEW_tournament_go;")
+        cursor.execute("SELECT id, t_start, t_end, t_name, city_id, link FROM NEW_tournament_go;")
         all_tournaments = []
         result = cursor.fetchall()
 
@@ -789,7 +774,7 @@ def all_tournaments_in_city_NEW(chatID): #выполняет запрос на �
                 tournament = "Начало: " + str(res[1]) + "\n"
                 tournament += "Конец: " + str(res[2]) + "\n\n"
                 tournament += "Название: " + res[3] + "\n\n"
-                tournament += "Город: " + res[4] + "\n\n"
+                tournament += "Город: " + getCityNameById(res[4]) + "\n\n"
                 tournament += "Подробнее: " + res[5] + "\n"
                 all_tournaments.append([res[0], tournament])
 
@@ -808,7 +793,7 @@ def all_tournaments_in_city_NEW_20(chatID): #выполняет запрос н�
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
-        cursor.execute("SELECT id, t_start, t_end, t_name, city, link FROM NEW_tournament_up_to_20;")
+        cursor.execute("SELECT id, t_start, t_end, t_name, city_id, link FROM NEW_tournament_up_to_20;")
         all_tournaments = []
         result = cursor.fetchall()
 
@@ -819,7 +804,7 @@ def all_tournaments_in_city_NEW_20(chatID): #выполняет запрос н�
                 tournament = "Начало: " + str(res[1]) + "\n"
                 tournament += "Конец: " + str(res[2]) + "\n\n"
                 tournament += "Название: " + res[3] + "\n\n"
-                tournament += "Город: " + res[4] + "\n\n"
+                tournament += "Город: " + getCityNameById(res[4]) + "\n\n"
                 tournament += "Подробнее: " + res[5] + "\n"
                 all_tournaments.append([res[0], tournament])
 
@@ -944,21 +929,6 @@ def del_message_was_send():
         cursor.close()
         conn.close()
 
-def remove_city_for_user(userID): 
-    try:
-        dbconfig = read_db_config()
-        conn = MySQLConnection(**dbconfig)
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM UserCity WHERE id_user=" + str(userID))
-        conn.commit()
-
-    except Error as e:
-        print('Error:', e)
-
-    finally:
-        cursor.close()
-        conn.close()
-
 def removal_from_child_category(userID):
     try:
         dbconfig = read_db_config()
@@ -1009,6 +979,114 @@ def if_is_tournament_up_to_20(userID, state):
         cursor.close()
         conn.close()    
         return result 
+
+def getCityIdByName(name):
+
+    cityId = 0
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM `Cities` Where title = '" + str(name) + "';")
+        records = cursor.fetchall()
+
+        if any(records):
+            cityId = records[0][0]
+
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+    return str(cityId)
+
+def getCityNameById(id):
+
+    cityName = ''
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("SELECT title FROM `Cities` Where id = '" + str(id) + "';")
+        records = cursor.fetchall()
+        if any(records):
+            cityName = records[0][0]
+
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+    return str(cityName)
+
+def getUserIdByChatId(chatId):
+
+    userId = 0
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM `user_BotGo` where id_User = '" + str(chatId) + "';")
+        records = cursor.fetchall()
+        if any(records):
+            userId = records[0][0]
+
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+    return userId
+
+def getUsersChatByCityId(CityId): ####
+
+    chats = []
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("SELECT u.id_User FROM user_BotGo as u JOIN user_cities as uc ON uc.user_id = u.id JOIN Cities as c ON c.id = uc.city_id WHERE c.id = '" + str(CityId) + "'")
+        records = cursor.fetchall()
+        for item in records:
+            chats.append(item[0])
+
+    except Error as e:
+        print('Error:', e)
+
+    finally:
+        cursor.close()
+        conn.close()
+    
+    return chats
+
+def getTournomentMessageById(tournamentId):
+
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, t_start, t_end, t_name, city_id, link FROM NEW_tournament_go where id = '" + str(tournamentId) + "';")
+        all_tournaments = []
+        result = cursor.fetchall()[0]
+
+        tournament = "Начало: " + str(result[1]) + "\n"
+        tournament += "Конец: " + str(result[2]) + "\n\n"
+        tournament += "Название: " + result[3] + "\n\n"
+        tournament += "Город: " + getCityNameById(result[4]) + "\n\n"
+        tournament += "Подробнее: " + result[5] + "\n"
+
+        conn.commit()
+
+    except Error as e:
+        print(e)
+
+    finally:
+        cursor.close()
+        conn.close()
+        return tournament
 
 # if __name__ == '__main__':
     
