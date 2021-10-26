@@ -1,3 +1,14 @@
-import os
+from datetime import datetime
 
-os.system("docker run --env HOST=194.32.248.108  --env DATABASE=tournament_go --env USER=foilv --env PASSWORD={{ PASSWORD }} --env BOT={{ BOT }} foilv/tournaments_go:bot15")
+def date(): 
+    date = datetime.now().date()
+    try:           
+        format_string = "%Y-%m-%d"
+        today = datetime.strptime(str(date), format_string).strftime("%Y-%m-%d")
+        print(today)
+    except TypeError as e:
+        print(e)
+
+if __name__ == '__main__':
+    date()
+

@@ -323,7 +323,7 @@ def background():
         main.delete_old_tournaments(),  # удаление устаревших по дате турниров из основной таблицы
         main.delete_old_tournaments20(),  # удаление устаревших по дате детских турниров из основной таблицы
 
-        time.sleep(600)
+        time.sleep(300)
         
 def welcome(chat, mainButton):
     main.query_change_state("main", chat.id)
